@@ -1,0 +1,53 @@
+---
+title: "Teaching Experience"
+subtitle: "March 6, 2022"
+author: "Kara E. McCormack"
+format: 
+  revealjs:
+    theme: slides.scss
+    transition: fade
+    slide-number: true
+    incremental: true 
+    chalkboard: true
+editor: visual
+execute:
+  freeze: auto
+  echo: true
+---
+
+```{r}
+#| include: false
+# figure options
+knitr::opts_chunk$set(
+  fig.width = 8, fig.asp = 0.618, out.width = "90%",
+  fig.retina = 3, dpi = 300, fig.align = "center"
+)
+library(countdown)
+```
+
+# Welcome
+
+## University of Miami
+
+![](./img/umiami.png){.absolute top="120" left="30" width="500" height="500"}
+
+
+---
+
+## Coach for College
+
+![](./img/group_work.JPG){.absolute top="90" left="0" width="400" height="280"}
+
+![](./img/volley.JPG){.absolute top="90" right="230" width="400" height="580"}
+
+![](./img/classroom.JPG){.absolute bottom="10" left="0" width="400" height="300"}
+
+![](./img/boat.JPG){.absolute top="90" right="-40" width="250" height="300"}
+
+![](./img/lineup.JPG){.absolute bottom="5" right="-40" width="250" height="300"}
+---
+
+## Miami-Dade College
+
+
+---
