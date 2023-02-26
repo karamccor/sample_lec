@@ -29,12 +29,13 @@ execute:
 library(countdown)
 ```
 
-## Outline
+# Welcome!
+
+## Topics
 
 ::: nonincremental
--   Review of linear regression and assumptions
--   Logistic regression
--   Multivariate logistic regression
+-   Logistic regression + inference
+-   Multivariate logistic regression + inference
 -   Activity
 :::
 
@@ -58,60 +59,73 @@ library(RColorBrewer)
 ggplot2::theme_set(ggplot2::theme_minimal(base_size = 20))
 ```
 
-
 ---
 
-## Why regression?
+## Assumptions
 
 ::: nonincremental
--   Regression is a way of learning about mechanisms, or driver(s), of an outcome. 
--   Typically use $X$ to denote the driver(s) and $Y$ to denote the outcome. 
--   We might refer to $X$ as the *independent variable*, *covariate*, *risk factor*, *predictor*, or *feature*. 
--   We might refer to $Y$ as the *dependent variable*, *response*, or *outcome*. 
+-   familiar with R and tidyverse
+-   familiar with linear regression
+-   interested in reviewing logistic regression + inference + visualization
 :::
 
 ---
-
-## Univariate regression
-
-::: nonincremental
--   In univariate regression, we assume it is possible to clearly identify which variables are covariates and which are outcomes. 
--   However, this may not be possible.
--   For example, insomnia and depression. Does insomnia lead to depression? Or does depression lead to insomnia?
--   Multivariate approaches which jointly model more than one outcome may be appropriate. 
-:::
-
-
----
-
-## How can we use regression?
-
-::: nonincremental
--   To quantify association
--   To explain variability
--   Estimate the effect of an intervention
--   Predict outcomes
-:::
-
 
 # Logistic regression
 
-## Topics
-
-::: nonincremental
--   Using logistic regression for a binary response
--   Odds vs. probabilities
--   Using logistic regression model
-:::
-
----
 
 ## Logistic regression
 
 ::: nonincremental
--   Logistic regression is a **generalized linear model** where the outcome is a two-level categorical variable. 
+-   Logistic regression is a **generalized linear model** used to analyze two types of responses.
+-   **Bernoulli**: Responses are either success $(Y=1)$ or failure $(Y=0)$
 
--   The response $Y$ takes value 1 with probability $\pi$ and value 0 with probability $1-\pi$. 
+$$P(Y=y) = p^y(1-p)^{1-y}, \quad y=0, 1$$
+-   **Binomial**: Response has $y$ successes among $n$ indep. Bernoulli trials w/ constant $P(\text{success})=p$
+
+$$P(Y=y) = {n \choose y}p^y(1-p)^{n-y}, \quad y = 0, 1, \ldots, n$$
+:::
+
+---
+
+## Bernoulli or Binomial?
+
+Determine if the following are bernoulli or binomial. 
+
+:::nonincremental
+- Sample ruffed grouse (a type of bird) population in Michigan for presence of West Nile virus to estimate prevalence of virus in population.
+
+- Use age, sex, and alcohol history to determine probability that an individual has liver disease.  
+:::
+
+```{r}
+#| echo: false
+library(countdown)
+countdown(minutes = 1, 
+          margin = "1.25%")
+```
+
+---
+
+## Logit link
+
+Binomial and bernoulli random variables can be written in one-parameter exponential family form, $f(y;\theta) = exp{[a(y)b(\theta) + c(\theta) + d(y)]}$
+
+**Bernoulli**
+
+$$f(y;\pi) = \exp\Big(y \log \Big(\frac{\pi}{1-\pi}\Big) + \log(1-\pi)\Big)$$
+
+**Binomial**
+
+$$f(y;n, \pi) = \exp\Big(y \log \Big(\frac{\pi}{1-\pi}\Big) + n\log(1-\pi) + \log {n \choose y} \Big)$$
+
+We'll stick to bernoulli responses for now.
+
+---
+
+## Logistic regression, bernoulli response
+::: nonincremental
+-   Suppose response $Y$ takes value 1 with probability $\pi$ and value 0 with probability $1-\pi$. 
 
 -   $\frac{\pi}{1-\pi}$: **odds** that $Y=1$
 
@@ -349,7 +363,7 @@ acu_model %>%
   kable(digits = 3)
 ```
 
-**Conclusion**: Since the p-value is quite small, we reject $H_0$. The data provide sufficient evidence that the treatment is a statistically significant predictor of being migraine-pain-free post-treatment.
+**Conclusion**: Since the p-value is quite small, we reject $H_0$. The data provide sufficient evidence that the acupuncture treatment is a statistically significant predictor of being migraine-pain-free post-treatment.
 
 
 # Multivariable Logistic Regression
@@ -483,7 +497,7 @@ ggplot(data = nhanes_adult, aes(x = HealthGen)) +
 ### Age vs. Health rating
 ```{r}
 #| echo: false
-#| fig-height: 3
+#| fig-height: 5
 ggplot(data = nhanes_adult, aes(x = HealthGen, y = Age)) +
   geom_boxplot(fill = "#fc8d59") + 
   labs(title = "Age vs. Health Rating") +
@@ -560,55 +574,64 @@ For each additional year of age, the odds a person rates themselves as having po
 For those who have trouble sleeping, the odds they rate themselves as having poor health versus excellent health are expected to multiply by 5.306 (exp(1.669)), holding age constant. 
 :::
 
-# Lizard example
-
-## Lizard habitat
-
-Does the lizard habitat influence the sunlight level at time of observation?
-
 
 ---
 
-## The data
-
-```{r}
-lizard_habitat %>%
-  glimpse()
-```
-
-## Exploratory data analysis
-
-```{r}
-p2 <- ggplot(data = lizard_habitat, aes(x = site, fill = sunlight)) +
-  geom_bar(position = "fill") +
-  labs(y = "Proportion", 
-       title = "Sunlight vs. Habitat site") 
-p2
-```
+## Interpretations: intercept
+$$\log\Big(\frac{\hat{\pi}_{Poor}}{\hat{\pi}_{Excellent}}\Big) = -3.567 + 0.031 \cdot \text{Age} + 1.669 \cdot \text{SleepTrouble}$$
+::: question
+What is the interpretation for the intercept of this model, in terms of odds?
+:::
 
 ---
 
-## Exploratory Data Analysis
+## Interpretations: intercept
+$$\log\Big(\frac{\hat{\pi}_{Poor}}{\hat{\pi}_{Excellent}}\Big) = -3.567 + 0.031 \cdot \text{Age} + 1.669 \cdot \text{SleepTrouble}$$
+
+The odds a 0 year-old person without sleep trouble rates themselves as having poor health versus excellent health are 0.028 (exp(-3.567)).
+
+-   Would need to mean-center age for the intercept to have a meaningful interpretation.
+
+---
+
+## Confidence Interval for Sleep Trouble
 
 ```{r}
 #| echo: false
-p1 <- ggplot(data = lizard_habitat, 
-             aes(x = site)) + 
-  geom_bar() +
-  labs(title = "Distribution of Habitat site")
+tidy(health_m, conf.int = TRUE, exponentiate = FALSE) %>%
+  filter(y.level == "Poor") %>%
+  kable(digits = 3, format = "markdown")
+```
 
-p2 <- ggplot(data = lizard_habitat, 
-             aes(x = sunlight)) + 
-  geom_bar() +
-  labs(title = "Amount of sunlight")
+We are 95% confident that, if someone has trouble sleeping, the odds the person rates themselves as poor health vs excellent health will multiply by 3.735 (exp(3.138)) to 7.538 (exp(2.020)), holding age constant.
 
-p1
-p2
+---
+
+### Visualization
+
+```{r}
+#| echo: true
+model_coef <- tidy(health_m, exponentiate = TRUE, conf.int = TRUE) %>%
+  filter(y.level %in% c("Fair", "Poor"))
+ggplot(data = model_coef, aes(x = term, y = estimate)) +
+  geom_point() +
+  geom_hline(yintercept = 1, lty = 2) + 
+  geom_pointrange(aes(ymin = conf.low, ymax = conf.high))+
+  labs(title = "Exponentiated model coefficients") + 
+  coord_flip() +
+  facet_wrap(~y.level)
 ```
 
 
+---
 
+## Recap
 
+::: nonincremental
+-   Logistic regression + inference, acupuncture example
+-   Multivariate logistic regression + inference, health rating example
+-   Next up, activity
+:::
 
 # Activity
 
@@ -624,40 +647,25 @@ p2
 
 :::
 
+
 ---
 
-## Recap
+## Acknowledgements
 
 ::: nonincremental
--   Reviewed of linear regression, assumptions
--   Logistic regression
--   Multivariate logistic regression
--   Activity
+-   [BMLR Chapter 6](https://bookdown.org/roback/bookdown-BeyondMLR/ch-logreg.html#introduction-to-logistic-regression)
+
 :::
 
+
 ---
+
+
 
 ## End of class survey
 
 
 ![](./img/qr_code_google_form.png){.absolute top="170" left="30" width="500" height="500"}
-
----
-
-
-## Computational setup
-
-```{r}
-#| echo: true
-# load packages
-library(tidyverse)
-library(tidymodels)
-library(openintro)
-library(knitr)
-# set default theme and larger font size for ggplot2
-ggplot2::theme_set(ggplot2::theme_minimal(base_size = 20))
-```
-
 
 
 # That's all, folks!
