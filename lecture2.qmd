@@ -1,0 +1,514 @@
+---
+title: "Introduction to Regression"
+subtitle: "March 6, 2023"
+author: "Kara E. McCormack"
+format: 
+  revealjs:
+    theme: slides.scss
+    transition: fade
+    slide-number: true
+    incremental: true 
+    chalkboard: true
+editor: visual
+execute:
+  freeze: auto
+  echo: true
+---
+
+```{r}
+#| include: false
+# figure options
+# knitr::opts_chunk$set(
+#   fig.width = 8, 
+#   fig.asp = 0.618, 
+#   out.width = "90%",
+#   fig.retina = 3, 
+#   dpi = 300, 
+#   fig.align = "center"
+# )
+library(countdown)
+```
+
+# Welcome
+
+## Outline
+
+::: nonincremental
+-   Review of linear regression and assumptions
+-   Logistic regression
+-   Multivariate logistic regression
+-   Activity
+:::
+
+---
+
+## Computational Setup
+
+```{r}
+#| echo: true
+# load packages
+library(tidyverse)
+library(tidymodels)
+library(openintro)
+library(knitr)
+library(RColorBrewer)
+# set default theme and larger font size for ggplot2
+ggplot2::theme_set(ggplot2::theme_minimal(base_size = 20))
+```
+
+
+---
+
+## Why regression?
+
+::: nonincremental
+-   Regression is a way of learning about mechanisms, or driver(s), of an outcome. 
+-   Typically use $X$ to denote the driver(s) and $Y$ to denote the outcome. 
+-   We might refer to $X$ as the *independent variable*, *covariate*, *risk factor*, *predictor*, or *feature*. 
+-   We might refer to $Y$ as the *dependent variable*, *response*, or *outcome*. 
+:::
+
+---
+
+## Univariate regression
+
+::: nonincremental
+-   In univariate regression, we assume it is possible to clearly identify which variables are covariates and which are outcomes. 
+-   However, this may not be possible.
+-   For example, insomnia and depression. Does insomnia lead to depression? Or does depression lead to insomnia?
+-   Multivariate approaches which jointly model more than one outcome may be appropriate. 
+:::
+
+
+---
+
+## How can we use regression?
+
+::: nonincremental
+-   To quantify association
+-   To explain variability
+-   Estimate the effect of an intervention
+-   Predict outcomes
+:::
+
+
+# Logistic regression
+
+## Topics
+
+::: nonincremental
+-   Using logistic regression for a binary response
+-   Odds vs. probabilities
+-   Using logistic regression model
+:::
+
+---
+
+## Logistic regression
+
+::: nonincremental
+-   Logistic regression is a **generalized linear model** where the outcome is a two-level categorical variable. 
+
+-   The response $Y$ takes value 1 with probability $\pi$ and value 0 with probability $1-\pi$. 
+
+-   $\frac{\pi}{1-\pi}$: **odds** that $Y=1$
+
+-   $\log\big(\frac{\pi}{1-\pi}\big)$: **log odds**
+
+-   How do we get from $\pi$ to $\log\big(\frac{\pi}{1-\pi}\big)$? With the **logit transformation**.
+
+:::
+
+
+::: {.notes}
+https://warpwire.duke.edu/w/pXgFAA/
+:::
+
+---
+
+## Odds to probabilities
+
+**Odds**
+
+$$\omega = \frac{\pi}{1-\pi}$$
+
+**Probability**
+
+$$\pi = \frac{\omega}{1+\omega}$$
+
+---
+
+
+
+
+---
+
+## Acupuncture example 
+
+::: incremental
+-   The `openintro::migraine` dataset is from a study about ear acupuncture in treatment of migraine attacks. 
+-   **Response**: `pain_free` = yes or no
+-   **Predictor**: `group` = control or treatment
+-   **Research question**: Is acupuncture treatment associated with a reduction of pain?
+:::
+
+
+---
+
+## Exploratory Data Analysis
+
+::: nonincremental
+-   **Research question**: Is acupuncture treatment associated with a reduction of pain?
+:::
+
+```{r}
+#| echo: false
+#| fig-height: 4
+
+migraine %>%
+  ggplot(aes(x = group, fill = pain_free)) +
+  geom_bar(position = "fill") +
+  labs(y = "Proportion", 
+       title = "Acupuncture vs. Pain_free") +
+  scale_fill_brewer(palette = "Set2", 
+                    direction = -1) +
+  coord_flip()
+
+```
+
+::: {.notes}
+G. Allais et al. Ear acupuncture in the treatment of migraine attacks: a randomized trial on the efficacy of appropriate versus inappropriate acupoints. In: Neurological Sci. 32.1 (2011), pp. 173-175. 
+
+The majority of the points were located on the antero-
+internal part of the antitragus (area M) on the same side of pain. The aim of this study was to verify the therapeutic value of area M and to compare it with an area of the ear (representation of the sciatic nerve, area S) which probably does not have a therapeutic effect on migraine attacks.
+:::
+
+---
+
+## Modeling being pain-free
+
+```{r}
+#| echo: true
+
+acu_model <- glm(pain_free ~ group, 
+                  data  = migraine, 
+                 family = "binomial")
+acu_model %>%
+  tidy %>%
+  kable(digits = 3)
+```
+
+$$\log\Big(\frac{\hat{\pi}}{1-\hat{\pi}}\Big) = -3.091 + 1.897 \times \text{treatment}$$
+---
+
+## Interpreting **treatment** coefficient - log odds
+
+```{r}
+#| echo: false
+acu_model %>%
+  tidy %>%
+  kable(digits = 3)
+```
+The **log-odds** of being pain-free post-treatment are expected to be 1.897 higher for those who received treatment compared to those who did not receive treatment. 
+
+
+---
+
+## Interpreting **treatment** coefficient - odds
+
+```{r}
+acu_model %>%
+  tidy %>%
+  kable(digits = 3)
+```
+
+The **odds** of being pain-free post-treatment for those who received treatment are expected to be 6.67 (i.e. exp(1.897)) times the odds for those who received the control.
+
+
+---
+
+## Hypothesis test for $\beta_j$ {.smaller}
+
+**Hypotheses**: $H_0: \beta_j = 0$ vs $H_A: \beta_j \neq 0$
+
+::: nonincremental
+-   $H_0$: There is no linear relationship between the variable of interest and the log-odds of the response.
+
+-   $H_A$: There **is** a linear relationship between the variable of interest and the log-odds of the response.
+:::
+
+**Test statistic**:
+
+$$z = \frac{\hat{\beta_j}-0}{SE_{\hat{\beta}_j}}$$
+
+**P-value**: $P(|Z|>|z|)$, where $Z\sim N(0,1)$. 
+
+---
+
+## Confidence interval for $\beta_j$
+
+Can calculate a **C% confidence interval** for $\beta_j$:
+
+$$\hat{\beta_j} \pm z^* SE_{\hat{\beta_j}}$$
+
+where $z^*$ comes from $N(0,1)$.
+
+
+This is an interval for the change in log-odds of the response for a one-unit increase in $x_j$.
+
+---
+
+## Interpretation in terms of odds
+
+The change in **odds** for every one-unit change in $x_j$. 
+
+$$\exp{\hat{\beta}_j \pm z^* SE_{\hat{\beta}_j}}$$
+
+**Interpretation**: We are $C$% confident that for every one-unit increase in $x_j$, the odds multiply by a factor of $\big\{\exp{\hat{\beta}_j - z^* SE_{\hat{\beta}_j}}\big\}$ to $\big\{\exp{\hat{\beta}_j + z^* SE_{\hat{\beta}_j}}\big\}$, holding all other variables constant. 
+
+
+
+---
+
+## Let's look at the coefficient for treatment
+
+```{r}
+#| echo: false
+acu_model %>%
+  tidy %>%
+  kable(digits = 3)
+```
+
+**Test statistic**
+
+$$z = \frac{1.897-0}{0.808}= 2.34778$$
+
+---
+
+## Let's look at the coefficient for treatment
+
+```{r}
+#| echo: false
+acu_model %>%
+  tidy %>%
+  kable(digits = 3)
+```
+
+
+**P-value**
+
+$$P(|Z| > |2.34778|)$$
+
+```{r}
+2 * pnorm(2.34778, lower.tail = FALSE)
+```
+
+
+
+---
+
+## Let's look at the coefficient for treatment
+
+```{r}
+#| echo: false
+acu_model %>%
+  tidy %>%
+  kable(digits = 3)
+```
+
+**Conclusion**: Since the p-value is quite small, we reject $H_0$. The data provide sufficient evidence that the treatment is a statistically significant predictor of being migraine-pain-free post-treatment.
+
+# Multivariable Logistic Regression
+
+
+## NHANES data
+
+::: nonincremental
+-   American National Health and Nutrition Examination Survey, NHANES R package, collected by the National Center for Health Statistics (NCHS)
+-   Survey: Individuals of all ages complete a health exam.
+-   Data from 2009-2010 and 2011-2012 sample years
+-   R package data adapted for educational purposes, not suitable for research
+-   For research purposes, download original files from [NCHS website](http://www.cdc.gov/nchs/nhanes.htm)
+-   ?NHANES in R for list of variables
+
+:::
+
+---
+
+## Self-reported health vs. Age & Sleep Trouble
+
+## The data
+
+```{r}
+library(NHANES)
+nhanes_adult <- NHANES %>%
+  filter(Age >= 18) %>%
+  select(HealthGen, Age, SleepTrouble) %>%
+  drop_na() %>%
+  mutate(obs_num = 1:n())
+```
+
+## Exploratory Data Analysis
+
+::: {.panel-tabset}
+
+### Age
+
+```{r}
+#| echo: false
+ggplot(data = nhanes_adult, aes(x = Age)) + 
+  geom_histogram() +
+  labs(title = "Distribution of Age")
+```
+
+### Trouble Sleeping
+
+```{r}
+#| echo: false
+ggplot(data = nhanes_adult, aes(x = SleepTrouble)) + 
+  geom_bar() +
+  labs(title = "Has had trouble sleeping")
+```
+
+### Self-Reported Health
+
+```{r}
+#| echo: false
+ggplot(data = nhanes_adult, aes(x = HealthGen)) + 
+  geom_bar() +
+  labs(title = "Self-reported rating of overall health")
+```
+
+:::
+
+
+---
+
+## Exploratory data analysis
+
+
+```{r}
+#| echo: false
+#| fig-height: 3
+ggplot(data = nhanes_adult, aes(x = HealthGen, y = Age)) +
+  geom_boxplot(fill = "#fc8d59") + 
+  labs(title = "Age vs. Health Rating") +
+  coord_flip()
+```
+
+```{r}
+#| echo: false
+#| fig-height: 3
+ggplot(data = nhanes_adult, aes(x = SleepTrouble, 
+                                fill = HealthGen)) +
+  geom_bar(position = "fill") +
+  labs(y = "Proportion", 
+       title = "Sleep Trouble vs. Health Rating") +
+  scale_fill_brewer(palette = "Spectral", 
+                    direction = -1)
+```
+
+
+---
+
+# Lizard example
+
+## Lizard habitat
+
+Does the lizard habitat influence the sunlight level at time of observation?
+
+
+---
+
+## The data
+
+```{r}
+lizard_habitat %>%
+  glimpse()
+```
+
+## Exploratory data analysis
+
+```{r}
+p2 <- ggplot(data = lizard_habitat, aes(x = site, fill = sunlight)) +
+  geom_bar(position = "fill") +
+  labs(y = "Proportion", 
+       title = "Sunlight vs. Habitat site") 
+p2
+```
+
+---
+
+## Exploratory Data Analysis
+
+```{r}
+#| echo: false
+p1 <- ggplot(data = lizard_habitat, 
+             aes(x = site)) + 
+  geom_bar() +
+  labs(title = "Distribution of Habitat site")
+
+p2 <- ggplot(data = lizard_habitat, 
+             aes(x = sunlight)) + 
+  geom_bar() +
+  labs(title = "Amount of sunlight")
+
+p1
+p2
+```
+
+
+
+
+
+# Activity
+
+## Regression Bingo Game
+
+::: nonincremental
+- Pair up - two people per bingo card.
+- Each square on bingo card has a question.
+- "Answers" located throughout room. If you think you've found a correct answer, take a sticker and place it in the square. 
+  -   Write a note on your card about what the answer said
+- When you get bingo (3 in a row), shout it out and share your 3 question/answers. 
+- If you'd like to see any slide from this lecture, feel free to ask!
+
+:::
+
+---
+
+## Recap
+
+::: nonincremental
+-   Reviewed of linear regression, assumptions
+-   Logistic regression
+-   Multivariate logistic regression
+-   Activity
+:::
+
+---
+
+## End of class survey
+
+
+![](./img/qr_code_google_form.png){.absolute top="170" left="30" width="500" height="500"}
+
+---
+
+
+## Computational setup
+
+```{r}
+#| echo: true
+# load packages
+library(tidyverse)
+library(tidymodels)
+library(openintro)
+library(knitr)
+# set default theme and larger font size for ggplot2
+ggplot2::theme_set(ggplot2::theme_minimal(base_size = 20))
+```
+
+
+
+# That's all, folks!
