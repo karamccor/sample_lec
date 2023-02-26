@@ -29,8 +29,6 @@ execute:
 library(countdown)
 ```
 
-# Welcome
-
 ## Outline
 
 ::: nonincremental
@@ -52,6 +50,10 @@ library(tidymodels)
 library(openintro)
 library(knitr)
 library(RColorBrewer)
+```
+
+```{r}
+#| echo: false
 # set default theme and larger font size for ggplot2
 ggplot2::theme_set(ggplot2::theme_minimal(base_size = 20))
 ```
@@ -126,6 +128,16 @@ https://warpwire.duke.edu/w/pXgFAA/
 
 ---
 
+## Types of models
+
+| Method                        | Response Type | Model |   
+|-------------------------------|---------------|-------|
+| Linear Regression             | Quantitative       | $Y = \beta_0 + \beta_1~ X$ |
+| Logistic regression           | Binary        | $\log\big(\frac{\pi}{1-\pi}\big) = \beta_0  + \beta_1 ~ X$ |  
+
+
+---
+
 ## Odds to probabilities
 
 **Odds**
@@ -138,6 +150,16 @@ $$\pi = \frac{\omega}{1+\omega}$$
 
 ---
 
+## From odds to probabilities
+
+::: nonincremental
+-   **odds** $= \exp \{\log(\frac{\pi}{1-\pi})\}= \frac{\pi}{1-\pi}$
+-   **logistic model**: log odds = $\log\big(\frac{\pi}{1-\pi}\big) = \beta_0 + \beta_1 X$ 
+
+- Combining these, we get:
+
+$$\text{probability} = \pi = \frac{\exp\{\beta_0 + \beta_1 X\}}{1+ \exp\{\beta_0 + \beta_1 X\}}$$
+:::
 
 
 
@@ -145,7 +167,7 @@ $$\pi = \frac{\omega}{1+\omega}$$
 
 ## Acupuncture example 
 
-::: incremental
+::: nonincremental
 -   The `openintro::migraine` dataset is from a study about ear acupuncture in treatment of migraine attacks. 
 -   **Response**: `pain_free` = yes or no
 -   **Predictor**: `group` = control or treatment
@@ -157,8 +179,10 @@ $$\pi = \frac{\omega}{1+\omega}$$
 
 ## Exploratory Data Analysis
 
+::: question
 ::: nonincremental
 -   **Research question**: Is acupuncture treatment associated with a reduction of pain?
+:::
 :::
 
 ```{r}
@@ -198,7 +222,10 @@ acu_model %>%
   kable(digits = 3)
 ```
 
+::: poll
 $$\log\Big(\frac{\hat{\pi}}{1-\hat{\pi}}\Big) = -3.091 + 1.897 \times \text{treatment}$$
+:::
+
 ---
 
 ## Interpreting **treatment** coefficient - log odds
@@ -227,7 +254,7 @@ The **odds** of being pain-free post-treatment for those who received treatment 
 
 ---
 
-## Hypothesis test for $\beta_j$ {.smaller}
+## Hypothesis test for $\beta_j$
 
 **Hypotheses**: $H_0: \beta_j = 0$ vs $H_A: \beta_j \neq 0$
 
@@ -236,6 +263,12 @@ The **odds** of being pain-free post-treatment for those who received treatment 
 
 -   $H_A$: There **is** a linear relationship between the variable of interest and the log-odds of the response.
 :::
+
+---
+
+## Hypothesis test for $\beta_j$
+
+**Hypotheses**: $H_0: \beta_j = 0$ vs $H_A: \beta_j \neq 0$
 
 **Test statistic**:
 
@@ -318,8 +351,44 @@ acu_model %>%
 
 **Conclusion**: Since the p-value is quite small, we reject $H_0$. The data provide sufficient evidence that the treatment is a statistically significant predictor of being migraine-pain-free post-treatment.
 
+
 # Multivariable Logistic Regression
 
+## Multivariate response
+
+::: nonincremental
+
+-   Suppose our response variable $y$ takes on multiple categories $1, \ldots, K$ 
+
+
+-   **Multinomial distribution**: 
+
+$$P(y=1) = \pi_1, P(y=2) = \pi_2, \ldots, P(y=K) = \pi_K$$
+
+with $\sum_{k=1}^K \pi_k = 1$
+
+
+:::
+
+---
+
+## Multinomial logistic regression
+
+::: nonincremental
+-   Choose a baseline category for the response (i.e. $y=1$). 
+
+
+$$\log\Big(\frac{\pi_{ik}}{\pi_{i1}}\Big)=\beta_{0k} + \beta_{1k}x_i$$
+
+- There is a separate equation for each level of response, relative to baseline category.
+
+:::
+
+::: question
+If we have $K$ categories of the response, how many equations will we have as part of our multinomial logistic regression model?
+:::
+
+---
 
 ## NHANES data
 
@@ -329,13 +398,27 @@ acu_model %>%
 -   Data from 2009-2010 and 2011-2012 sample years
 -   R package data adapted for educational purposes, not suitable for research
 -   For research purposes, download original files from [NCHS website](http://www.cdc.gov/nchs/nhanes.htm)
--   ?NHANES in R for list of variables
+-   `?NHANES` in R for list of variables
 
 :::
 
 ---
 
 ## Self-reported health vs. Age & Sleep Trouble
+
+::: nonincremental
+-   **Research question**: Is there an association between age, trouble sleeping, and self-reported health status?
+-   Variables:
+
+    - **HealthGen**: self-reported health rating: Poor, Fair, Good, VGood, or Excellent.
+    
+    - **Age**: age (years) at time of screening. Participants > 80 recorded as 80.
+    
+    - **SleepTrouble**: has told doctor that they had trouble sleeping: Yes or No. 
+  
+:::
+
+---
 
 ## The data
 
@@ -348,10 +431,19 @@ nhanes_adult <- NHANES %>%
   mutate(obs_num = 1:n())
 ```
 
+```{r}
+#| echo: false
+nhanes_adult %>%
+  head() %>%
+  kable()
+```
+
+
+
+
 ## Exploratory Data Analysis
 
 ::: {.panel-tabset}
-
 ### Age
 
 ```{r}
@@ -387,6 +479,8 @@ ggplot(data = nhanes_adult, aes(x = HealthGen)) +
 ## Exploratory data analysis
 
 
+::: {.panel-tabset}
+### Age vs. Health rating
 ```{r}
 #| echo: false
 #| fig-height: 3
@@ -396,6 +490,7 @@ ggplot(data = nhanes_adult, aes(x = HealthGen, y = Age)) +
   coord_flip()
 ```
 
+### Sleep trouble vs. Health rating
 ```{r}
 #| echo: false
 #| fig-height: 3
@@ -407,9 +502,63 @@ ggplot(data = nhanes_adult, aes(x = SleepTrouble,
   scale_fill_brewer(palette = "Spectral", 
                     direction = -1)
 ```
+:::
+
+---
+
+## Model in R
+
+::: nonincremental
+-   Use the `multinom()` function in the **nnet** R package. 
+
+```{r results = 'hide'}
+library(nnet)
+health_m <- multinom(HealthGen ~ Age + SleepTrouble, 
+                     data = nhanes_adult)
+```
+
+:::
+
+---
+
+## Output results
+```{r}
+#| echo: true
+#| output-location: slide
+tidy(health_m, conf.int = TRUE, exponentiate = FALSE) %>%
+  kable(digits = 3, format = "markdown")
+```
 
 
 ---
+
+## Poor vs. Excellent health
+
+```{r}
+#| echo: false
+tidy(health_m, conf.int = TRUE, exponentiate = FALSE) %>%
+  filter(y.level == "Poor") %>%
+  kable(digits = 3, format = "markdown")
+```
+
+::: nonincremental
+-   Baseline category of health rating is **Excellent**.
+-   Model equation: the log odds that a person rates themselves "Poor" vs "Excellent" health is
+
+$$\log\Big(\frac{\hat{\pi}_{Poor}}{\hat{\pi}_{Excellent}}\Big) = -3.567 + 0.031 \cdot \text{Age} + 1.669 \cdot \text{SleepTrouble}$$
+:::
+
+---
+
+## Interpretations
+
+::: incremental
+$$\log\Big(\frac{\hat{\pi}_{Poor}}{\hat{\pi}_{Excellent}}\Big) = -3.567 + 0.031 \cdot \text{Age} + 1.669 \cdot \text{SleepTrouble}$$
+
+For each additional year of age, the odds a person rates themselves as having poor health vs. excellent health are expected to multiply by 1.031 (exp(0.031)), assuming they have no sleep trouble. 
+
+For those who have trouble sleeping, the odds they rate themselves as having poor health versus excellent health are expected to multiply by 5.306 (exp(1.669)), holding age constant. 
+:::
 
 # Lizard example
 
