@@ -25,54 +25,92 @@ knitr::opts_chunk$set(
 library(countdown)
 ```
 
+## University of Miami {.smaller}
 
-## University of Miami
+::: nonincremental
+- Diving team
+- Majored in mathematics, math lab tutor
+- Service opportunity for student-athletes
+:::
 
-![](./img/umiami2.jpg){.absolute top="120" left="0" width="400" height="280"}
+![](./img/um_pool.jpg){.absolute bottom="20" left="0" width="490" height="340"}
 
-![](./img/graduate.jpg){.absolute bottom="55" left="0" width="400" height="250"}
+![](./img/graduate.jpg){.absolute bottom="20" right="-40" width="500" height="340"}
 
-![](./img/um_pool.jpg){.absolute top="120" right="10" width="650" height="500"}
+::: {.notes}
+I did my undergraduate studies at University of Miami in FL. One of the key aspects of my experience there was being a student-athlete - I was on the diving team. If you can believe it, I used to do a handstand at the top of the ten meter platform and dive into the water. During that time, my life revolved around sports, and I hadn't given much thought to my career after school. However, I always really liked math (after having some great teachers growing up) and decided to major in math. I worked in the math lab as a tutor and began to really liked tutoring. It felt great to be able to explain a concept to someone in a different way than they had thought about it before, and have it land and make sense. During the summer between my junior and senior year, I had the opportunity to join an amazing service opportunity specifically for student athletes, called Coach for College. 
+:::
 
 ---
 
-## Coach for College
+## Coach for College {.smaller}
 
-![](./img/group_work.JPG){.absolute top="90" left="0" width="400" height="280"}
+:::: {.columns}
 
-![](./img/volley.JPG){.absolute top="90" right="230" width="400" height="580"}
+::: {.column width="45%"}
+::: nonincremental
+- Promoting higher education through sports
+- Physics and volleyball coach
+- Vietnamese college students as translators
+:::
+:::
+
+::: {.column width="60%"}
+
+:::
+
+::::
+
+
+![](./img/volley.JPG){.absolute top="80" right="280" width="300" height="400"}
+
+![](./img/group_work.JPG){.absolute bottom="10" right="280" width="300" height="220"}
 
 ![](./img/classroom.JPG){.absolute bottom="10" left="0" width="400" height="300"}
 
-![](./img/boat.JPG){.absolute top="90" right="-40" width="250" height="300"}
+![](./img/boat.JPG){.absolute top="80" right="-40" width="250" height="300"}
 
 ![](./img/lineup.JPG){.absolute bottom="5" right="-40" width="250" height="300"}
+
+
+::: {.notes}
+Coach for college is an incredible summer service opportunity for student athletes, where you travel for three weeks to rural vietnam and help facilitate a summer school/sports camp for middle school kids, the goal being to promote higher education. I taught physics and coached volleyball, two areas that I was not super familiar with, but it was such a fun chance to review a topic that I hadn't looked at since high school, think about creative lesson planning, and then offer these to the kids in engaging ways. The kids mainly spoke vietnamese, so we worked alongside vietnamese college students who were translators. This was such a fun experience that really solidified my love for teaching. 
+:::
 ---
 
-## Miami-Dade College, then Duke!
+## Miami-Dade College, then Duke! {.smaller}
 
-First IORs: college algebra and calculus I
+::: nonincremental
+- First IORs: college algebra and calculus I
+- PhD in biostatistics at Duke: methods for cancer epidemiology and measuring social determinants of health
+- TA and guest lecturer for undergrad + graduate courses in (bio)statistics and bioinformatics courses 
+:::
 
-Inspired by teaching, let's get a PhD!
+![](./img/mdc2.jpg){.absolute bottom="0" left="0" width="500" height="360"}
+
+![](./img/duke.jpg){.absolute bottom="0" right="0" width="500" height="360"}
 
 
-![](./img/mdc2.jpg){.absolute bottom="60" left="0" width="500" height="400"}
+::: {.notes}
+I went back to Miami, finished my last year of undergrad, and then got a Master's in math in order to be able to teach at the community college level. I spent a year as an adjunct instructor at Miami Dade College, with my first instructor-of-records being college algebra and calculus 1. Many of the students I taught were coming back to school after several years of not being in school, getting an associate's degree, or were getting transfer credits to attend another institution. It was a great experience to teach such a diverse range of students in this setting. 
 
-![](./img/duke.jpg){.absolute bottom="60" right="0" width="500" height="400"}
+After being an adjunct, I decided I wanted to teach at the college level, and decided to pursue a PhD. I wound up at Duke in the biostatistics department, where I've had a number of wonderful teaching experiences, such as being a TA for undergrad and grad classes in the biostats and stats departments, as well as being a TA for bioinformatics courses. 
 
+:::
 
 ---
 
 ## Today
 
-::: incremental
-
--   intro to probability and statistics
--   foundational statistical concepts (i.e. regression)
--   coding in R: basics, data wrangling, tidyverse, etc.
--   data visualization, how to tell a great story
+::: nonincremental
+-   Intro to probability and statistics
+-   Foundational statistical concepts (i.e. regression)
+-   Coding in R: basics, data wrangling, tidyverse, etc.
+-   Data visualization, how to tell a great story
 :::
 
-
+::: {.notes}
+That's brought me to where I am today. Drawing on my mathematics background, I love teaching intro to probability and statistics, as well as foundational statistical concepts such as regression. I love teaching best coding practices and sharing tools to make statistical workflows more efficient and seamless. I also love to teach data visualization, I think being able to communicate your research through visual storytelling is incredibly important. 
+:::
 
 # Thanks for listening!
