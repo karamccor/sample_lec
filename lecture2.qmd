@@ -1,6 +1,6 @@
 ---
 title: "Introduction to Regression"
-subtitle: "March 6, 2023"
+subtitle: "Logistic Regression"
 author: "Kara E. McCormack"
 format: 
   revealjs:
@@ -29,17 +29,19 @@ execute:
 library(countdown)
 ```
 
-# Welcome!
-
 ## Topics
 
 ::: nonincremental
--   Logistic regression + inference
--   Multivariate logistic regression + inference
+-   Logistic regression within GLM framework
+-   Inference: hypothesis tests, confidence intervals, interpretations
+-   Example with code
 -   Activity
 :::
 
+Slides available here.
+
 ---
+
 
 ## Computational Setup
 
@@ -59,71 +61,66 @@ library(RColorBrewer)
 ggplot2::theme_set(ggplot2::theme_minimal(base_size = 20))
 ```
 
----
+
 
 ## Assumptions
 
 ::: nonincremental
--   familiar with R and tidyverse
--   familiar with linear regression
--   interested in reviewing logistic regression + inference + visualization
+-   Familiar with linear regression
+-   Some familiarity with definition of a generalized linear model (GLM), exponential form, and link function
+-   Familiar with R and tidyverse
 :::
-
----
 
 # Logistic regression
 
+## Linear vs. logistic regression {.small}
 
-## Logistic regression
+:::: {.columns}
 
+::: {.column width="50%"}
 ::: nonincremental
--   Logistic regression is a **generalized linear model** used to analyze two types of responses.
--   **Bernoulli**: Responses are either success $(Y=1)$ or failure $(Y=0)$
-
-$$P(Y=y) = p^y(1-p)^{1-y}, \quad y=0, 1$$
--   **Binomial**: Response has $y$ successes among $n$ indep. Bernoulli trials w/ constant $P(\text{success})=p$
-
-$$P(Y=y) = {n \choose y}p^y(1-p)^{n-y}, \quad y = 0, 1, \ldots, n$$
+-   Suppose response $Y$ takes value 1 with probability $\pi$ and value 0 with probability $1-\pi$. 
+-   Linear regression doesn't fit data well, and produces predicted probabilities below 0 and above 1. 
+-   However, logistic regression always produces probabilities between 0 and 1. 
+:::
 :::
 
----
-
-## Bernoulli or Binomial?
-
-Determine if the following are bernoulli or binomial. 
-
-:::nonincremental
-- Sample ruffed grouse (a type of bird) population in Michigan for presence of West Nile virus to estimate prevalence of virus in population.
-
-- Use age, sex, and alcohol history to determine probability that an individual has liver disease.  
-:::
-
+::: {.column width="50%"}
 ```{r}
 #| echo: false
-library(countdown)
-countdown(minutes = 1, 
-          margin = "1.25%")
+
+set.seed(56)
+dat <- tibble(x=runif(200, -5, 10),
+                  p=exp(-2+1*x)/(1+exp(-2+1*x)),
+                  y=rbinom(200, 1, p),
+                  y2=.3408+.0901*x,
+                  logit=log(p/(1-p)))
+dat2 <- tibble(x = c(dat$x, dat$x),
+               y = c(dat$y2, dat$p),
+               `Regression model` = c(rep("linear", 200),
+                                      rep("logistic", 200)))
+ggplot() + 
+  geom_point(data = dat, aes(x, y)) +
+  geom_line(data = dat2, aes(x, y, linetype = `Regression model`)) 
+
 ```
+:::
+
+::::
+
+
+
+
+Plot from [BMLR Chapter 6](https://bookdown.org/roback/bookdown-BeyondMLR/ch-logreg.html).
+
+::: {.notes}
+The solid line is a linear regression fit with least squares to the probability of success (Y=1) for a given value of X. With a binary response, the line doesn't fit the data well, and produces predicted probabilities below 0 and above 1. On the other hand, logistic regression (dashed curve) follows data closely and always produces predicted probabilities between 0 and 1. 
+:::
+
 
 ---
 
-## Logit link
-
-Binomial and bernoulli random variables can be written in one-parameter exponential family form, $f(y;\theta) = exp{[a(y)b(\theta) + c(\theta) + d(y)]}$
-
-**Bernoulli**
-
-$$f(y;\pi) = \exp\Big(y \log \Big(\frac{\pi}{1-\pi}\Big) + \log(1-\pi)\Big)$$
-
-**Binomial**
-
-$$f(y;n, \pi) = \exp\Big(y \log \Big(\frac{\pi}{1-\pi}\Big) + n\log(1-\pi) + \log {n \choose y} \Big)$$
-
-We'll stick to bernoulli responses for now.
-
----
-
-## Logistic regression, bernoulli response
+## Logistic regression setup
 ::: nonincremental
 -   Suppose response $Y$ takes value 1 with probability $\pi$ and value 0 with probability $1-\pi$. 
 
@@ -142,17 +139,12 @@ https://warpwire.duke.edu/w/pXgFAA/
 
 ---
 
-## Types of models
-
-| Method                        | Response Type | Model |   
-|-------------------------------|---------------|-------|
-| Linear Regression             | Quantitative       | $Y = \beta_0 + \beta_1~ X$ |
-| Logistic regression           | Binary        | $\log\big(\frac{\pi}{1-\pi}\big) = \beta_0  + \beta_1 ~ X$ |  
-
-
----
 
 ## Odds to probabilities
+
+::: nonincremental
+- We've seen how to get from probability to odds, now how about odds to probability?
+:::
 
 **Odds**
 
@@ -167,15 +159,17 @@ $$\pi = \frac{\omega}{1+\omega}$$
 ## From odds to probabilities
 
 ::: nonincremental
--   **odds** $= \exp \{\log(\frac{\pi}{1-\pi})\}= \frac{\pi}{1-\pi}$
 -   **logistic model**: log odds = $\log\big(\frac{\pi}{1-\pi}\big) = \beta_0 + \beta_1 X$ 
+-   **odds** $= \exp \{\log(\frac{\pi}{1-\pi})\}= \frac{\pi}{1-\pi}$
 
-- Combining these, we get:
+- **probability model**: combining this w/ previous slide, we get:
 
 $$\text{probability} = \pi = \frac{\exp\{\beta_0 + \beta_1 X\}}{1+ \exp\{\beta_0 + \beta_1 X\}}$$
 :::
 
-
+::: {.notes}
+We can use our logistic regression model to calculate probability. 
+:::
 
 ---
 
@@ -187,6 +181,126 @@ $$\text{probability} = \pi = \frac{\exp\{\beta_0 + \beta_1 X\}}{1+ \exp\{\beta_0
 -   **Predictor**: `group` = control or treatment
 -   **Research question**: Is acupuncture treatment associated with a reduction of pain?
 :::
+
+
+---
+
+
+## Logistic regression: a GLM {.small}
+
+::: nonincremental
+-   Logistic regression is a **generalized linear model** in which we can analyze data with a dichotomous response with  $P(\text{success}=\pi)$.
+-   **Bernoulli**: Responses are either success $(Y=1)$ or failure $(Y=0)$
+
+$$P(Y=y) = \pi^y(1-\pi)^{1-y}, \quad y=0, 1$$
+
+-   **Binomial**: Each observation has $n$ bernoulli trials, each with $P(\text{success})=\pi$.
+
+$$P(Y=y) = {n \choose y}\pi^y(1-\pi)^{(n-y)} $$
+:::
+
+
+---
+
+## Binomial or Bernoulli? {.smallish}
+
+::: nonincremental
+
+1. Is exposure to a particular chemical associated with a cancer diagnosis?
+2. Absenteeism data are collected for 146 randomly selected students in New South Wales, Australia across one school year. Are demographic characteristics of children associated with absenteeism? 
+
+To submit answers: $\quad \quad \quad \quad \quad$ or click [here](https://forms.gle/Y8fwCZz3svXuQV8G6). 
+:::
+
+![](./img/qr_binomial_bernoulli_quiz.png){.absolute bottom="20" left="300" width="200" height="300"}
+
+```{r}
+#| echo: false
+library(countdown)
+countdown(minutes = 1,
+          seconds = 30,
+          margin = "1.25%")
+```
+
+
+---
+
+## Binomial or Bernoulli? {.smallish}
+
+::: incremental
+
+1. Is exposure to a particular chemical associated with a cancer diagnosis?
+
+- Bernoulli: The outcome is whether or not a person was diagnosed with cancer.
+
+2. Absenteeism data are collected for 146 randomly selected students in New South Wales, Australia across one school year. Are demographic characteristics of children associated with absenteeism? 
+
+- Binomial: The outcome is the number of days a student was absent out of $n$ days in a school year. 
+
+:::
+
+---
+
+## Exponential form {.smallish}
+
+A bernoulli random variable can be written in one-parameter exponential family form, $f(y;\theta) = \exp{[a(y)b(\theta) + c(\theta) + d(y)]}$
+
+**Bernoulli**
+
+$$f(y;\pi) = \exp\Big[y \log \Big(\frac{\pi}{1-\pi}\Big) + \log(1-\pi)\Big]$$
+
+
+::: question
+What are $a(y), b(\pi), c(\pi)$, and $d(y)$?
+:::
+
+```{r}
+#| echo: false
+library(countdown)
+countdown(minutes = 1, 
+          margin = "1.25%")
+```
+
+
+
+---
+
+## Exponential form {.smallish}
+
+A bernoulli random variable can be written in one-parameter exponential family form, $f(y;\theta) = \exp{[a(y)b(\theta) + c(\theta) + d(y)]}$
+
+**Bernoulli**
+
+$$f(y;\pi) = \exp\Big[y \log \Big(\frac{\pi}{1-\pi}\Big) + \log(1-\pi)\Big]$$
+
+
+::: question
+What are $a(y), b(\pi), c(\pi)$, and $d(y)$?
+:::
+
+$a(y) = y$, $b(\pi)= \log \Big(\frac{\pi}{1-\pi}\Big)$, $c(\pi) = \log(1-\pi)$, and $d(y) = 0$.
+
+$b(\pi)$ is the **canonical link function**. 
+
+
+---
+
+
+## Assumptions of logistic regression
+
+
+::: nonincremental
+1. **Binary responses**: Response is dichotomous (only takes on two values), or is the sum of dichotomous responses.
+2. **Independence**: Observations independent of one another. 
+3. **Variance structure**: Variance of binomial random variable is $n\pi(1-\pi)$, variance highest when $\pi=0.5$.
+4. **Linearity**: Log of the odds ratio, $\log (\frac{\pi}{1-\pi})$, is a linear function of $x$.
+:::
+
+
+
+
+---
+
 
 
 ---
@@ -242,6 +356,27 @@ $$\log\Big(\frac{\hat{\pi}}{1-\hat{\pi}}\Big) = -3.091 + 1.897 \times \text{trea
 
 ---
 
+## Predicted log odds
+
+```{r}
+predict(acu_model)[41:48]
+```
+
+Individuals 41-43 were in control group, while individuals 44-48 were in treatment group. 
+
+---
+
+## Predicted probabilities
+```{r}
+predict(acu_model, 
+        type = "response")[41:48]
+migraine
+```
+```
+
+
+---
+
 ## Interpreting **treatment** coefficient - log odds
 
 ```{r}
@@ -258,6 +393,7 @@ The **log-odds** of being pain-free post-treatment are expected to be 1.897 high
 ## Interpreting **treatment** coefficient - odds
 
 ```{r}
+#| echo: false
 acu_model %>%
   tidy %>%
   kable(digits = 3)
@@ -366,9 +502,9 @@ acu_model %>%
 **Conclusion**: Since the p-value is quite small, we reject $H_0$. The data provide sufficient evidence that the acupuncture treatment is a statistically significant predictor of being migraine-pain-free post-treatment.
 
 
-# Multivariable Logistic Regression
+# Multinomial Logistic Regression
 
-## Multivariate response
+## Multinomial response
 
 ::: nonincremental
 
@@ -395,11 +531,7 @@ with $\sum_{k=1}^K \pi_k = 1$
 $$\log\Big(\frac{\pi_{ik}}{\pi_{i1}}\Big)=\beta_{0k} + \beta_{1k}x_i$$
 
 - There is a separate equation for each level of response, relative to baseline category.
-
-:::
-
-::: question
-If we have $K$ categories of the response, how many equations will we have as part of our multinomial logistic regression model?
+- If we have $K$ categories of the response, will have $K-1$ equations as part of ourmultinomial logistic regression model.
 :::
 
 ---
@@ -421,14 +553,14 @@ If we have $K$ categories of the response, how many equations will we have as pa
 ## Self-reported health vs. Age & Sleep Trouble
 
 ::: nonincremental
--   **Research question**: Is there an association between age, trouble sleeping, and self-reported health status?
--   Variables:
 
-    - **HealthGen**: self-reported health rating: Poor, Fair, Good, VGood, or Excellent.
-    
-    - **Age**: age (years) at time of screening. Participants > 80 recorded as 80.
-    
-    - **SleepTrouble**: has told doctor that they had trouble sleeping: Yes or No. 
+::: question
+**Research question**: Is there an association between age, trouble sleeping, and self-reported health status?
+:::
+
+- **HealthGen**: self-reported health rating: Poor, Fair, Good, VGood, or Excellent.
+- **Age**: age (years) at time of screening. Participants > 80 recorded as 80.
+- **SleepTrouble**: has told doctor that they had trouble sleeping: Yes or No. 
   
 :::
 
@@ -507,7 +639,7 @@ ggplot(data = nhanes_adult, aes(x = HealthGen, y = Age)) +
 ### Sleep trouble vs. Health rating
 ```{r}
 #| echo: false
-#| fig-height: 3
+#| fig-height: 5
 ggplot(data = nhanes_adult, aes(x = SleepTrouble, 
                                 fill = HealthGen)) +
   geom_bar(position = "fill") +
@@ -531,6 +663,7 @@ health_m <- multinom(HealthGen ~ Age + SleepTrouble,
                      data = nhanes_adult)
 ```
 
+-   If you don't specify a baseline value of response, R defaults to first level alphabetically (i.e. excellent). 
 :::
 
 ---
@@ -538,15 +671,16 @@ health_m <- multinom(HealthGen ~ Age + SleepTrouble,
 ## Output results
 ```{r}
 #| echo: true
-#| output-location: slide
 tidy(health_m, conf.int = TRUE, exponentiate = FALSE) %>%
+  head(8) %>%
   kable(digits = 3, format = "markdown")
+  
 ```
 
 
 ---
 
-## Poor vs. Excellent health
+## Poor vs. Excellent health {.smallish}
 
 ```{r}
 #| echo: false
@@ -559,7 +693,10 @@ tidy(health_m, conf.int = TRUE, exponentiate = FALSE) %>%
 -   Baseline category of health rating is **Excellent**.
 -   Model equation: the log odds that a person rates themselves "Poor" vs "Excellent" health is
 
+::: poll
 $$\log\Big(\frac{\hat{\pi}_{Poor}}{\hat{\pi}_{Excellent}}\Big) = -3.567 + 0.031 \cdot \text{Age} + 1.669 \cdot \text{SleepTrouble}$$
+:::
+
 :::
 
 ---
@@ -567,9 +704,10 @@ $$\log\Big(\frac{\hat{\pi}_{Poor}}{\hat{\pi}_{Excellent}}\Big) = -3.567 + 0.031 
 ## Interpretations
 
 ::: incremental
+::: poll
 $$\log\Big(\frac{\hat{\pi}_{Poor}}{\hat{\pi}_{Excellent}}\Big) = -3.567 + 0.031 \cdot \text{Age} + 1.669 \cdot \text{SleepTrouble}$$
-
-For each additional year of age, the odds a person rates themselves as having poor health vs. excellent health are expected to multiply by 1.031 (exp(0.031)), assuming they have no sleep trouble. 
+:::
+For each additional year of age, the odds a person rates themselves as having poor health vs. excellent health are expected to multiply by 1.031 (exp(0.031)), holding sleep trouble constant.
 
 For those who have trouble sleeping, the odds they rate themselves as having poor health versus excellent health are expected to multiply by 5.306 (exp(1.669)), holding age constant. 
 :::
@@ -578,7 +716,11 @@ For those who have trouble sleeping, the odds they rate themselves as having poo
 ---
 
 ## Interpretations: intercept
+
+::: poll
 $$\log\Big(\frac{\hat{\pi}_{Poor}}{\hat{\pi}_{Excellent}}\Big) = -3.567 + 0.031 \cdot \text{Age} + 1.669 \cdot \text{SleepTrouble}$$
+:::
+
 ::: question
 What is the interpretation for the intercept of this model, in terms of odds?
 :::
@@ -586,11 +728,16 @@ What is the interpretation for the intercept of this model, in terms of odds?
 ---
 
 ## Interpretations: intercept
-$$\log\Big(\frac{\hat{\pi}_{Poor}}{\hat{\pi}_{Excellent}}\Big) = -3.567 + 0.031 \cdot \text{Age} + 1.669 \cdot \text{SleepTrouble}$$
 
+::: poll
+$$\log\Big(\frac{\hat{\pi}_{Poor}}{\hat{\pi}_{Excellent}}\Big) = -3.567 + 0.031 \cdot \text{Age} + 1.669 \cdot \text{SleepTrouble}$$
+:::
+
+::: nonincremental
 The odds a 0 year-old person without sleep trouble rates themselves as having poor health versus excellent health are 0.028 (exp(-3.567)).
 
 -   Would need to mean-center age for the intercept to have a meaningful interpretation.
+:::
 
 ---
 
@@ -598,16 +745,19 @@ The odds a 0 year-old person without sleep trouble rates themselves as having po
 
 ```{r}
 #| echo: false
+#| fig-width: 3
 tidy(health_m, conf.int = TRUE, exponentiate = FALSE) %>%
   filter(y.level == "Poor") %>%
+  dplyr::select(y.level, term, estimate, p.value, 
+                conf.low, conf.high) %>%
   kable(digits = 3, format = "markdown")
 ```
 
-We are 95% confident that, if someone has trouble sleeping, the odds the person rates themselves as poor health vs excellent health will multiply by 3.735 (exp(3.138)) to 7.538 (exp(2.020)), holding age constant.
+We are 95% confident that, if someone has trouble sleeping, the odds the person rates themselves as poor health vs excellent health will multiply by 3.735 (exp(1.318)) to 7.538 (exp(2.020)), holding age constant.
 
 ---
 
-### Visualization
+### Visualization: forest plots
 
 ```{r}
 #| echo: true
@@ -623,15 +773,6 @@ ggplot(data = model_coef, aes(x = term, y = estimate)) +
 ```
 
 
----
-
-## Recap
-
-::: nonincremental
--   Logistic regression + inference, acupuncture example
--   Multivariate logistic regression + inference, health rating example
--   Next up, activity
-:::
 
 # Activity
 
@@ -650,22 +791,26 @@ ggplot(data = model_coef, aes(x = term, y = estimate)) +
 
 ---
 
+## Recap
+
+::: nonincremental
+-   Logistic regression in context of GLM
+-   Multinomial logistic regression + inference, health rating example
+-   Bingo game
+:::
+
+---
+
 ## Acknowledgements
 
 ::: nonincremental
 -   [BMLR Chapter 6](https://bookdown.org/roback/bookdown-BeyondMLR/ch-logreg.html#introduction-to-logistic-regression)
 
+-   [Introduction to Modern Statistics, Chapter 9](https://openintro-ims.netlify.app/model-logistic.html#model-logistic)
+
+-   [STA210: Regression Analysis](https://sta210-fa21.netlify.app/)
+
 :::
-
-
----
-
-
-
-## End of class survey
-
-
-![](./img/qr_code_google_form.png){.absolute top="170" left="30" width="500" height="500"}
 
 
 # That's all, folks!
