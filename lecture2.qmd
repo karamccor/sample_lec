@@ -38,7 +38,6 @@ library(countdown)
 -   Activity
 :::
 
-Slides available here.
 
 ---
 
@@ -111,7 +110,7 @@ ggplot() +
 
 
 
-Plot from [BMLR Chapter 6](https://bookdown.org/roback/bookdown-BeyondMLR/ch-logreg.html).
+Plot from [BeyondMLR Chapter 6](https://bookdown.org/roback/bookdown-BeyondMLR/ch-logreg.html).
 
 ::: {.notes}
 The solid line is a linear regression fit with least squares to the probability of success (Y=1) for a given value of X. With a binary response, the line doesn't fit the data well, and produces predicted probabilities below 0 and above 1. On the other hand, logistic regression (dashed curve) follows data closely and always produces predicted probabilities between 0 and 1. 
@@ -122,11 +121,12 @@ The solid line is a linear regression fit with least squares to the probability 
 
 ## Logistic regression setup
 ::: nonincremental
--   Suppose response $Y$ takes value 1 with probability $\pi$ and value 0 with probability $1-\pi$. 
+-   Suppose response $Y$ takes value 1 with probability $\pi$ and value 0 with probability $1-\pi$. Let $X$ be a predictor.
 
--   $\frac{\pi}{1-\pi}$: **odds** that $Y=1$
+-   **odds** that $Y=1$ = $\frac{\pi}{1-\pi}$: 
+-   Example: If $p(\text{win}) = .6$, then $\text{odds}(\text{win}) = \frac{.6}{1-.6} = 1.5$.
 
--   $\log\big(\frac{\pi}{1-\pi}\big)$: **log odds**
+-   **log odds** = $\log\big(\frac{\pi}{1-\pi}\big)$
 
 -   How do we get from $\pi$ to $\log\big(\frac{\pi}{1-\pi}\big)$? With the **logit transformation**.
 
@@ -135,6 +135,8 @@ The solid line is a linear regression fit with least squares to the probability 
 
 ::: {.notes}
 https://warpwire.duke.edu/w/pXgFAA/
+Unc vs duke on saturday march 4
+acc tournament march 7-11.
 :::
 
 ---
@@ -159,7 +161,7 @@ $$\pi = \frac{\omega}{1+\omega}$$
 ## From odds to probabilities
 
 ::: nonincremental
--   **logistic model**: log odds = $\log\big(\frac{\pi}{1-\pi}\big) = \beta_0 + \beta_1 X$ 
+-   **logistic model**: $\log\big(\frac{\pi}{1-\pi}\big) = \beta_0 + \beta_1 X$ 
 -   **odds** $= \exp \{\log(\frac{\pi}{1-\pi})\}= \frac{\pi}{1-\pi}$
 
 - **probability model**: combining this w/ previous slide, we get:
@@ -176,7 +178,8 @@ We can use our logistic regression model to calculate probability.
 ## Acupuncture example 
 
 ::: nonincremental
--   The `openintro::migraine` dataset is from a study about ear acupuncture in treatment of migraine attacks. 
+-   The `openintro::migraine` dataset is from a study about ear acupuncture in treatment of migraine attacks.
+-   Treatment (area of ear associated with headache) vs. "placebo" treatment (area of ear associated with sciatica). 
 -   **Response**: `pain_free` = yes or no
 -   **Predictor**: `group` = control or treatment
 -   **Research question**: Is acupuncture treatment associated with a reduction of pain?
@@ -185,6 +188,131 @@ We can use our logistic regression model to calculate probability.
 
 ---
 
+## Exploratory Data Analysis
+
+::: question
+::: nonincremental
+-   **Research question**: Is acupuncture treatment associated with a reduction of pain?
+:::
+:::
+
+```{r}
+#| echo: false
+#| fig-height: 4
+
+migraine %>%
+  ggplot(aes(x = group, fill = pain_free)) +
+  geom_bar(position = "fill") +
+  labs(y = "Proportion", 
+       title = "Acupuncture vs. Pain_free") +
+  scale_fill_brewer(palette = "Set2", 
+                    direction = -1) +
+  coord_flip()
+
+```
+
+::: {.notes}
+G. Allais et al. Ear acupuncture in the treatment of migraine attacks: a randomized trial on the efficacy of appropriate versus inappropriate acupoints. In: Neurological Sci. 32.1 (2011), pp. 173-175. 
+
+The majority of the points were located on the antero-
+internal part of the antitragus (area M) on the same side of pain. The aim of this study was to verify the therapeutic value of area M and to compare it with an area of the ear (representation of the sciatic nerve, area S) which probably does not have a therapeutic effect on migraine attacks.
+:::
+
+---
+
+## Modeling being pain-free
+
+```{r}
+#| echo: true
+
+acu_model <- glm(pain_free ~ group, 
+                  data  = migraine, 
+                 family = "binomial")
+acu_model %>%
+  tidy %>%
+  kable(digits = 3)
+```
+
+::: poll
+$$\log\Big(\frac{\hat{\pi}}{1-\hat{\pi}}\Big) = -3.091 + 1.897 \times \text{treatment}$$
+:::
+
+
+
+---
+
+## Interpreting **treatment** coefficient - log odds
+
+```{r}
+#| echo: false
+acu_model %>%
+  tidy %>%
+  kable(digits = 3)
+```
+The **log-odds** of being pain-free post-treatment are expected to be 1.897 higher for those who received treatment compared to those who did not receive treatment. 
+
+
+---
+
+## Interpreting **treatment** coefficient - odds
+
+```{r}
+#| echo: false
+acu_model %>%
+  tidy %>%
+  kable(digits = 3)
+```
+
+The **odds** of being pain-free post-treatment for those who received treatment are expected to be 6.67 (i.e. exp(1.897)) times the odds for those who received the control.
+
+---
+
+
+## Predicted log odds
+
+```{r}
+#| echo: false
+#| eval: true
+
+predict(acu_model) [1:7]
+```
+
+```{r}
+#| echo: true
+#| eval: false
+predict(acu_model)
+```
+For person 1:
+
+the predicted odds = 
+
+$$\hat{\omega} = \frac{\hat{\pi}}{{1-\hat{\pi}}} = \exp(-1.1939) = 0.303$$
+
+---
+
+## Predicted probabilities
+
+```{r}
+#| echo: true
+#| eval: false
+predict(acu_model, 
+        type = "response") #<<
+```
+
+```{r}
+#| echo: false
+predict(acu_model, 
+        type = "response")[1:7]
+```
+
+For person 1:
+
+predicted probability = 
+
+$$\hat{\pi} = \frac{\exp{(-1.1939)}}{1+\exp{(-1.1939)}} = .232$$ 
+
+
+---
 
 ## Logistic regression: a GLM {.small}
 
@@ -225,7 +353,7 @@ countdown(minutes = 1,
 
 ---
 
-## Binomial or Bernoulli? {.smallish}
+## Binomial or Bernoulli? Answers {.smallish}
 
 ::: incremental
 
@@ -299,108 +427,6 @@ $b(\pi)$ is the **canonical link function**.
 
 
 
----
-
-
-
----
-
-## Exploratory Data Analysis
-
-::: question
-::: nonincremental
--   **Research question**: Is acupuncture treatment associated with a reduction of pain?
-:::
-:::
-
-```{r}
-#| echo: false
-#| fig-height: 4
-
-migraine %>%
-  ggplot(aes(x = group, fill = pain_free)) +
-  geom_bar(position = "fill") +
-  labs(y = "Proportion", 
-       title = "Acupuncture vs. Pain_free") +
-  scale_fill_brewer(palette = "Set2", 
-                    direction = -1) +
-  coord_flip()
-
-```
-
-::: {.notes}
-G. Allais et al. Ear acupuncture in the treatment of migraine attacks: a randomized trial on the efficacy of appropriate versus inappropriate acupoints. In: Neurological Sci. 32.1 (2011), pp. 173-175. 
-
-The majority of the points were located on the antero-
-internal part of the antitragus (area M) on the same side of pain. The aim of this study was to verify the therapeutic value of area M and to compare it with an area of the ear (representation of the sciatic nerve, area S) which probably does not have a therapeutic effect on migraine attacks.
-:::
-
----
-
-## Modeling being pain-free
-
-```{r}
-#| echo: true
-
-acu_model <- glm(pain_free ~ group, 
-                  data  = migraine, 
-                 family = "binomial")
-acu_model %>%
-  tidy %>%
-  kable(digits = 3)
-```
-
-::: poll
-$$\log\Big(\frac{\hat{\pi}}{1-\hat{\pi}}\Big) = -3.091 + 1.897 \times \text{treatment}$$
-:::
-
----
-
-## Predicted log odds
-
-```{r}
-predict(acu_model)[41:48]
-```
-
-Individuals 41-43 were in control group, while individuals 44-48 were in treatment group. 
-
----
-
-## Predicted probabilities
-```{r}
-predict(acu_model, 
-        type = "response")[41:48]
-migraine
-```
-```
-
-
----
-
-## Interpreting **treatment** coefficient - log odds
-
-```{r}
-#| echo: false
-acu_model %>%
-  tidy %>%
-  kable(digits = 3)
-```
-The **log-odds** of being pain-free post-treatment are expected to be 1.897 higher for those who received treatment compared to those who did not receive treatment. 
-
-
----
-
-## Interpreting **treatment** coefficient - odds
-
-```{r}
-#| echo: false
-acu_model %>%
-  tidy %>%
-  kable(digits = 3)
-```
-
-The **odds** of being pain-free post-treatment for those who received treatment are expected to be 6.67 (i.e. exp(1.897)) times the odds for those who received the control.
-
 
 ---
 
@@ -464,7 +490,7 @@ acu_model %>%
 
 **Test statistic**
 
-$$z = \frac{1.897-0}{0.808}= 2.34778$$
+$$z = \frac{1.897-0}{0.808} = 2.34778$$
 
 ---
 
@@ -757,21 +783,49 @@ We are 95% confident that, if someone has trouble sleeping, the odds the person 
 
 ---
 
-### Visualization: forest plots
+### Visualization: forest plots {.smaller}
+
+::: {.panel-tabset}
+
+### Code
 
 ```{r}
 #| echo: true
+#| eval: false
 model_coef <- tidy(health_m, exponentiate = TRUE, conf.int = TRUE) %>%
-  filter(y.level %in% c("Fair", "Poor"))
+  filter(y.level =="Poor")
 ggplot(data = model_coef, aes(x = term, y = estimate)) +
   geom_point() +
   geom_hline(yintercept = 1, lty = 2) + 
   geom_pointrange(aes(ymin = conf.low, ymax = conf.high))+
   labs(title = "Exponentiated model coefficients") + 
-  coord_flip() +
-  facet_wrap(~y.level)
+  coord_flip()
 ```
 
+### Output
+
+```{r}
+#| echo: false
+#| eval: true
+model_coef <- tidy(health_m, exponentiate = TRUE, conf.int = TRUE) %>%
+  filter(y.level =="Poor")
+ggplot(data = model_coef, aes(x = term, y = estimate)) +
+  geom_point() +
+  geom_hline(yintercept = 1, lty = 2) + 
+  geom_pointrange(aes(ymin = conf.low, ymax = conf.high))+
+  labs(title = "Exponentiated model coefficients") + 
+  coord_flip()
+```
+
+:::
+
+---
+
+## Conclusion
+
+The data provide sufficient evidence that sleep trouble is a statistically significant predictor of rating oneself as "Poor" health vs. "Excellent", after accounting for age.
+
+The data provide sufficient evidence that age is a statistically significant predictor of rating oneself as "Poor" health vs. "Excellent", after accounting for sleep trouble.
 
 
 # Activity
@@ -781,7 +835,7 @@ ggplot(data = model_coef, aes(x = term, y = estimate)) +
 ::: nonincremental
 - Pair up - two people per bingo card.
 - Each square on bingo card has a question.
-- "Answers" located throughout room. If you think you've found a correct answer, take a sticker and place it in the square. 
+- "Answers" located throughout room. If you think you've found a correct answer, tear off answer and place it on the square. 
   -   Write a note on your card about what the answer said
 - When you get bingo (3 in a row), shout it out and share your 3 question/answers. 
 - If you'd like to see any slide from this lecture, feel free to ask!
