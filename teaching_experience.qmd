@@ -28,9 +28,10 @@ library(countdown)
 ## University of Miami {.smaller}
 
 ::: nonincremental
--   Diving team
+-   Student-athlete on the diving team
+-   Hadn't thought about teaching as a career
 -   Majored in mathematics, math lab tutor
--   Service opportunity for student-athletes
+-   Service opportunity for student-athletes sparked inspiration to pursue teaching
 :::
 
 ![](./img/um_pool.jpg){.absolute bottom="20" left="0" width="490" height="340"}
@@ -38,20 +39,19 @@ library(countdown)
 ![](./img/graduate.jpg){.absolute bottom="20" right="-40" width="500" height="340"}
 
 ::: notes
-I did my undergraduate studies at University of Miami in FL. Sports brought me to University of Miami, I was on the diving team, and this was a huge part of my identity at that time. I hadn't given much thought to my career after school. However, I always really liked math (after having some great teachers growing up) and decided to major in math. I worked in the math lab as a tutor and began to really liked tutoring. It felt great to be able to explain a concept to someone in a different way than they had thought about it before, and have it land and make sense. Toward the end of my undergraduate studies, I had the opportunity to do an incredible service opportunity over the summer that really sparked my interest in teaching. 
-
+I did my undergraduate studies at University of Miami in FL. Sports brought me to University of Miami, I was on the diving team, and this was a huge part of my identity at that time. I hadn't given much thought to my career after school. However, I always really liked math (after having some great teachers growing up) and decided to major in math. I worked in the math lab as a tutor and began to really liked tutoring. It felt great to be able to explain a concept to someone in a different way than they had thought about it before, and have it land and make sense. Toward the end of my undergraduate studies, I had the opportunity to do an incredible service opportunity over the summer that really sparked my interest in teaching.
 :::
 
----
+------------------------------------------------------------------------
 
 ## Coach for College {.smaller}
 
 ::: columns
 ::: {.column width="45%"}
 ::: nonincremental
--   Promoting higher education through sports
 -   Physics and volleyball coach
 -   Vietnamese college students as translators
+-   Learned how to be succinct, get creative w/ engaging activities
 :::
 :::
 
@@ -70,23 +70,24 @@ I did my undergraduate studies at University of Miami in FL. Sports brought me t
 ![](./img/lineup.JPG){.absolute bottom="5" right="-40" width="250" height="300"}
 
 ::: notes
-The program was called Coach for College. We traveled for three weeks to rural vietnam and help facilitate a summer school/sports camp for middle school kids, the goal being to promote higher education. During my time there, I taught physics and coached volleyball. Because of language barrier, we worked with translators to deliver each of the classes, and so it was a great opportunity to learn how to be succinct, and really think about how to fit in engaging activities with limited time. 
-
+The program was called Coach for College. We traveled for three weeks to rural vietnam and help facilitate a summer school/sports camp for middle school kids, the goal being to promote higher education. During my time there, I taught physics and coached volleyball. Because of language barrier, we worked with translators to deliver each of the classes, and so it was a great opportunity to learn how to be succinct, and really think about how to fit in engaging activities with limited time.
 :::
 
-------------------------------------------------------------------------
+---
 
 ## Miami-Dade College $\rightarrow$ Duke! {.smaller}
 
 ::: nonincremental
+-   Back to Miami, master's in math to teach at community college
 -   First IORs: college algebra and calculus I
+-   Students from many diverse backgrounds
 -   PhD in biostatistics at Duke: methods for cancer epidemiology and measuring social determinants of health
 -   TA and guest lecturer for undergrad + graduate courses in (bio)statistics and bioinformatics courses
 :::
 
-![](./img/adult_learn.png){.absolute bottom="0" left="0" width="500" height="340"}
+![](./img/adult_learn.png){.absolute bottom="0" left="0" width="500" height="280"}
 
-![](./img/duke.jpg){.absolute bottom="0" right="0" width="500" height="360"}
+![](./img/duke.jpg){.absolute bottom="0" right="0" width="500" height="280"}
 
 ::: notes
 I went back to Miami, finished my last year of undergrad, and then got a Master's in math in order to be able to teach at the community college level. I spent a year as an adjunct instructor at Miami Dade College, with my first instructor-of-records being college algebra and calculus 1. The students I taught came from diverse backgrounds: some were straight out of undergrad to get an associate's, some were getting transfer credits to apply to a different institution, and many had kids and were returning to school after many years of not being in school.
@@ -97,14 +98,15 @@ After being an adjunct, I decided I wanted to teach at the college level, and de
 -   graphic to show have taught in different depts to different types of people
 :::
 
-------------------------------------------------------------------------
+---
 
-## Today
+## Today {.smallish}
 
 ::: nonincremental
 -   Probability and statistical inference
 -   Coding in R: basics, data wrangling, tidyverse, visualization
 -   Tools for collaboration
+-   Innovative pedagogy to make an engaging, inclusive classroom
 :::
 
 ![](./img/regres.png){.absolute bottom="0" left="60" width="300" height="300"}
