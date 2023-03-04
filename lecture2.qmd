@@ -1,6 +1,6 @@
 ---
-title: "Introduction to Regression"
-subtitle: "Logistic Regression"
+title: "Logistic Regression"
+subtitle: "March 6, 2023"
 author: "Kara E. McCormack"
 format: 
   revealjs:
@@ -32,20 +32,22 @@ library(countdown)
 ## Topics
 
 ::: nonincremental
--   Logistic regression within GLM framework
--   Inference: hypothesis tests, confidence intervals, interpretations
--   Example with code
--   Activity
+-   Motivation
+-   Odds and probabilities
+-   Logistic regression model
+-   Example
 :::
 
+...with activities along the way!
 
 ---
 
+## Assumptions
 
-## Computational Setup
+
 
 ```{r}
-#| echo: true
+#| echo: false
 # load packages
 library(tidyverse)
 library(tidymodels)
@@ -54,70 +56,227 @@ library(knitr)
 library(RColorBrewer)
 ```
 
+
 ```{r}
 #| echo: false
 # set default theme and larger font size for ggplot2
 ggplot2::theme_set(ggplot2::theme_minimal(base_size = 20))
 ```
 
-
-
-## Assumptions
+I'm assuming you're familiar with:
 
 ::: nonincremental
--   Familiar with linear regression
--   Some familiarity with definition of a generalized linear model (GLM), exponential form, and link function
--   Familiar with R and tidyverse
+-   Linear regression
+-   Bernoulli and binomial distributions
+-   R and tidyverse
 :::
 
-# Logistic regression
+# Motivation
 
-## Linear vs. logistic regression {.small}
+## Review: linear regression
 
-:::: {.columns}
-
-::: {.column width="50%"}
-::: nonincremental
--   Suppose response $Y$ takes value 1 with probability $\pi$ and value 0 with probability $1-\pi$. 
--   Linear regression doesn't fit data well, and produces predicted probabilities below 0 and above 1. 
--   However, logistic regression always produces probabilities between 0 and 1. 
-:::
-:::
-
-::: {.column width="50%"}
 ```{r}
 #| echo: false
+# load packages
+library(tidyverse)
+library(tidymodels)
+library(openintro)
+library(knitr)
+library(RColorBrewer)
+```
 
+::: nonincremental
+- Linear regression is used to describe the relationship between a quantitative predictor and a quantitative response variable. 
+- Estimate the slope and intercept of the regression line using least squares method. 
+- Interpret slope and intercept. 
+:::
+
+```{r}
+#| echo: false
+library(fivethirtyeight)
+
+movie_scores <- fandango %>%
+  rename(critics = rottentomatoes, 
+         audience = rottentomatoes_user)
+```
+
+---
+
+## Example: movie ratings data 
+
+The data set contains the critics' score (**`critics`**)  and audience score (**`audience`**) for 146 movies rated on rottentomatoes.com.
+
+```{r}
+#| echo: false
+ggplot(data = movie_scores, mapping = aes(x = critics, y = audience)) +
+  geom_point(alpha = 0.5) + 
+  labs(x = "Critics Score" , 
+       y = "Audience Score") +
+  theme_bw()
+```
+
+---
+
+## A linear model for movie ratings
+
+We fit a linear regression model to describe the relationship between the critics score and audience score.
+
+```{r}
+#| echo: false
+ggplot(data = movie_scores, mapping = aes(x = critics, y = audience)) +
+  geom_point(alpha = 0.5) + 
+  geom_smooth(method = "lm", color = "coral2", se = FALSE) +
+  labs(x = "Critics Score" , 
+       y = "Audience Score") +
+  theme_bw()
+```
+
+
+
+---
+
+## Dichotomous outcomes  {.smaller}
+
+::: nonincremental
+- Now, what if we had a 0/1 outcome instead?
+- Suppose we observe whether or not a basketball player makes a free throw shot. 
+- Let $Y=1$ if they make the shot, and $Y=0$ if they miss. 
+- Can we fit a linear regression model?
+:::
+
+```{r}
+#| echo: false
 set.seed(56)
-dat <- tibble(x=runif(200, -5, 10),
+dat <- tibble(x=runif(100, -5, 10),
                   p=exp(-2+1*x)/(1+exp(-2+1*x)),
-                  y=rbinom(200, 1, p),
+                  y=rbinom(100, 1, p),
                   y2=.3408+.0901*x,
                   logit=log(p/(1-p)))
 dat2 <- tibble(x = c(dat$x, dat$x),
                y = c(dat$y2, dat$p),
-               `Regression model` = c(rep("linear", 200),
-                                      rep("logistic", 200)))
+               `Regression model` = c(rep("linear", 100),
+                                      rep("logistic", 100)))
 ggplot() + 
-  geom_point(data = dat, aes(x, y)) +
-  geom_line(data = dat2, aes(x, y, linetype = `Regression model`)) 
-
+  geom_point(data = dat, aes(x, y), alpha = 0.5) +
+  ylim(-.25, 1.25) +
+  theme_bw()
 ```
+
+
+---
+
+## Poor fit of linear regression {.smaller}
+
+::: nonincremental
+- Linear regression is a poor fit to the data.
+- Here, we'd like to model the probability of success, not the actual $Y$ values. 
+- Linear model predicts values above 1 and below 0. 
+- We can do better!
+:::
+```{r}
+#| echo: false
+ggplot() + 
+  geom_point(data = dat, aes(x, y), alpha = 0.5) +
+  geom_line(data = dat2 %>% filter(`Regression model` == "linear"), aes(x, y, linetype = `Regression model`)) +
+  ylim(-.25, 1.25) +
+  theme_bw()
+```
+
+
+
+---
+
+
+
+## Linear vs. logistic regression {.smaller}
+
+::: nonincremental
+-   Logistic regression (dashed curve) follows data closely and always produces predicted probabilities between 0 and 1. 
 :::
 
-::::
+
+```{r}
+#| echo: false
+ggplot() + 
+  geom_point(data = dat, aes(x, y), alpha = 0.5) +
+  geom_line(data = dat2, aes(x, y, linetype = `Regression model`)) +
+  ylim(-.25, 1.25) +
+  theme_bw()
+```
 
 
-
-
-Plot from [BeyondMLR Chapter 6](https://bookdown.org/roback/bookdown-BeyondMLR/ch-logreg.html).
 
 ::: {.notes}
 The solid line is a linear regression fit with least squares to the probability of success (Y=1) for a given value of X. With a binary response, the line doesn't fit the data well, and produces predicted probabilities below 0 and above 1. On the other hand, logistic regression (dashed curve) follows data closely and always produces predicted probabilities between 0 and 1. 
 :::
 
+---
+
+### Bernoulli + binomial random variables {.smaller}
+
+::: nonincremental
+- **Bernoulli**: $Y$ can take one of two values, success ($Y=1$) or failure ($Y=0$) 
+  - Let $P(Y=1)=\pi$, and $P(Y=0) = 1-\pi$
+  - Then $Y \sim \text{Bernoulli}(\pi)$
+    - $P(Y=y) = \pi^y (1-\pi)^{1-y}$ for $y=0, 1$
+- **Binomial**: $Y$ is the number of successes in $n$ bernoulli trials, each with probability of success $\pi$ 
+  - $Y \sim \text{Binomial},n, \pi)$ 
+  - $P(Y=y) = {n \choose y} \pi^y(1-\pi)^{n-y}$ for $y=0, 1, \ldots, n$
+:::
 
 ---
+
+## Binomial or Bernoulli? {.smallish}
+
+::: nonincremental
+
+1. Is exposure to a particular chemical associated with a cancer diagnosis?
+2. Absenteeism data are collected for 146 randomly selected students in New South Wales, Australia across one school year. Are demographic characteristics of children associated with absenteeism? 
+
+To submit answers: $\quad \quad \quad \quad \quad$ or click [here](https://forms.gle/Y8fwCZz3svXuQV8G6). 
+:::
+
+![](./img/qr_binomial_bernoulli_quiz.png){.absolute bottom="20" left="300" width="200" height="300"}
+
+```{r}
+#| echo: false
+library(countdown)
+countdown(minutes = 1,
+          seconds = 30,
+          margin = "1.25%")
+```
+
+
+---
+
+## Binomial or Bernoulli? Answers {.smallish}
+
+::: incremental
+
+1. Is exposure to a particular chemical associated with a cancer diagnosis?
+
+- Bernoulli: The outcome is whether or not a person was diagnosed with cancer.
+
+2. Absenteeism data are collected for 146 randomly selected students in New South Wales, Australia across one school year. Are demographic characteristics of children associated with absenteeism? 
+
+- Binomial: The outcome is the number of days a student was absent out of $n$ days in a school year. 
+
+:::
+
+---
+
+## Brainstorming predictors
+
+In groups of 3-4, brainstorm some predictors for the following outcomes. 
+::: nonincremental
+1. $Y$ = whether or not teenagers get 7+ hours of sleep per night.
+2. $Y$ = whether or not basketball players make their free-throw shots during a game.
+3. $Y$ = whether or not acupuncture treatment provides pain-relief for individuals with migraines.
+4. $Y$ = Whether a person self-rates their health status as "Good" or "Poor". 
+:::
+
+---
+
 
 ## Logistic regression setup
 ::: nonincremental
@@ -330,44 +489,11 @@ $$P(Y=y) = {n \choose y}\pi^y(1-\pi)^{(n-y)} $$
 
 ---
 
-## Binomial or Bernoulli? {.smallish}
-
-::: nonincremental
-
-1. Is exposure to a particular chemical associated with a cancer diagnosis?
-2. Absenteeism data are collected for 146 randomly selected students in New South Wales, Australia across one school year. Are demographic characteristics of children associated with absenteeism? 
-
-To submit answers: $\quad \quad \quad \quad \quad$ or click [here](https://forms.gle/Y8fwCZz3svXuQV8G6). 
-:::
-
-![](./img/qr_binomial_bernoulli_quiz.png){.absolute bottom="20" left="300" width="200" height="300"}
-
-```{r}
-#| echo: false
-library(countdown)
-countdown(minutes = 1,
-          seconds = 30,
-          margin = "1.25%")
-```
 
 
 ---
 
-## Binomial or Bernoulli? Answers {.smallish}
 
-::: incremental
-
-1. Is exposure to a particular chemical associated with a cancer diagnosis?
-
-- Bernoulli: The outcome is whether or not a person was diagnosed with cancer.
-
-2. Absenteeism data are collected for 146 randomly selected students in New South Wales, Australia across one school year. Are demographic characteristics of children associated with absenteeism? 
-
-- Binomial: The outcome is the number of days a student was absent out of $n$ days in a school year. 
-
-:::
-
----
 
 ## Exponential form {.smallish}
 
@@ -528,304 +654,24 @@ acu_model %>%
 **Conclusion**: Since the p-value is quite small, we reject $H_0$. The data provide sufficient evidence that the acupuncture treatment is a statistically significant predictor of being migraine-pain-free post-treatment.
 
 
-# Multinomial Logistic Regression
-
-## Multinomial response
-
-::: nonincremental
-
--   Suppose our response variable $y$ takes on multiple categories $1, \ldots, K$ 
-
-
--   **Multinomial distribution**: 
-
-$$P(y=1) = \pi_1, P(y=2) = \pi_2, \ldots, P(y=K) = \pi_K$$
-
-with $\sum_{k=1}^K \pi_k = 1$
-
-
-:::
-
 ---
 
-## Multinomial logistic regression
-
-::: nonincremental
--   Choose a baseline category for the response (i.e. $y=1$). 
-
-
-$$\log\Big(\frac{\pi_{ik}}{\pi_{i1}}\Big)=\beta_{0k} + \beta_{1k}x_i$$
-
-- There is a separate equation for each level of response, relative to baseline category.
-- If we have $K$ categories of the response, will have $K-1$ equations as part of ourmultinomial logistic regression model.
-:::
-
----
-
-## NHANES data
-
-::: nonincremental
--   American National Health and Nutrition Examination Survey, NHANES R package, collected by the National Center for Health Statistics (NCHS)
--   Survey: Individuals of all ages complete a health exam.
--   Data from 2009-2010 and 2011-2012 sample years
--   R package data adapted for educational purposes, not suitable for research
--   For research purposes, download original files from [NCHS website](http://www.cdc.gov/nchs/nhanes.htm)
--   `?NHANES` in R for list of variables
-
-:::
-
----
-
-## Self-reported health vs. Age & Sleep Trouble
-
-::: nonincremental
-
-::: question
-**Research question**: Is there an association between age, trouble sleeping, and self-reported health status?
-:::
-
-- **HealthGen**: self-reported health rating: Poor, Fair, Good, VGood, or Excellent.
-- **Age**: age (years) at time of screening. Participants > 80 recorded as 80.
-- **SleepTrouble**: has told doctor that they had trouble sleeping: Yes or No. 
-  
-:::
-
----
-
-## The data
-
-```{r}
-library(NHANES)
-nhanes_adult <- NHANES %>%
-  filter(Age >= 18) %>%
-  select(HealthGen, Age, SleepTrouble) %>%
-  drop_na() %>%
-  mutate(obs_num = 1:n())
-```
-
-```{r}
-#| echo: false
-nhanes_adult %>%
-  head() %>%
-  kable()
-```
-
-
-
-
-## Exploratory Data Analysis
-
-::: {.panel-tabset}
-### Age
-
-```{r}
-#| echo: false
-ggplot(data = nhanes_adult, aes(x = Age)) + 
-  geom_histogram() +
-  labs(title = "Distribution of Age")
-```
-
-### Trouble Sleeping
-
-```{r}
-#| echo: false
-ggplot(data = nhanes_adult, aes(x = SleepTrouble)) + 
-  geom_bar() +
-  labs(title = "Has had trouble sleeping")
-```
-
-### Self-Reported Health
-
-```{r}
-#| echo: false
-ggplot(data = nhanes_adult, aes(x = HealthGen)) + 
-  geom_bar() +
-  labs(title = "Self-reported rating of overall health")
-```
-
-:::
-
-
----
-
-## Exploratory data analysis
-
-
-::: {.panel-tabset}
-### Age vs. Health rating
-```{r}
-#| echo: false
-#| fig-height: 5
-ggplot(data = nhanes_adult, aes(x = HealthGen, y = Age)) +
-  geom_boxplot(fill = "#fc8d59") + 
-  labs(title = "Age vs. Health Rating") +
-  coord_flip()
-```
-
-### Sleep trouble vs. Health rating
-```{r}
-#| echo: false
-#| fig-height: 5
-ggplot(data = nhanes_adult, aes(x = SleepTrouble, 
-                                fill = HealthGen)) +
-  geom_bar(position = "fill") +
-  labs(y = "Proportion", 
-       title = "Sleep Trouble vs. Health Rating") +
-  scale_fill_brewer(palette = "Spectral", 
-                    direction = -1)
-```
-:::
-
----
-
-## Model in R
-
-::: nonincremental
--   Use the `multinom()` function in the **nnet** R package. 
-
-```{r results = 'hide'}
-library(nnet)
-health_m <- multinom(HealthGen ~ Age + SleepTrouble, 
-                     data = nhanes_adult)
-```
-
--   If you don't specify a baseline value of response, R defaults to first level alphabetically (i.e. excellent). 
-:::
-
----
-
-## Output results
-```{r}
-#| echo: true
-tidy(health_m, conf.int = TRUE, exponentiate = FALSE) %>%
-  head(8) %>%
-  kable(digits = 3, format = "markdown")
-  
-```
-
-
----
-
-## Poor vs. Excellent health {.smallish}
-
-```{r}
-#| echo: false
-tidy(health_m, conf.int = TRUE, exponentiate = FALSE) %>%
-  filter(y.level == "Poor") %>%
-  kable(digits = 3, format = "markdown")
-```
-
-::: nonincremental
--   Baseline category of health rating is **Excellent**.
--   Model equation: the log odds that a person rates themselves "Poor" vs "Excellent" health is
-
-::: poll
-$$\log\Big(\frac{\hat{\pi}_{Poor}}{\hat{\pi}_{Excellent}}\Big) = -3.567 + 0.031 \cdot \text{Age} + 1.669 \cdot \text{SleepTrouble}$$
-:::
-
-:::
-
----
-
-## Interpretations
-
-::: incremental
-::: poll
-$$\log\Big(\frac{\hat{\pi}_{Poor}}{\hat{\pi}_{Excellent}}\Big) = -3.567 + 0.031 \cdot \text{Age} + 1.669 \cdot \text{SleepTrouble}$$
-:::
-For each additional year of age, the odds a person rates themselves as having poor health vs. excellent health are expected to multiply by 1.031 (exp(0.031)), holding sleep trouble constant.
-
-For those who have trouble sleeping, the odds they rate themselves as having poor health versus excellent health are expected to multiply by 5.306 (exp(1.669)), holding age constant. 
-:::
-
-
----
-
-## Interpretations: intercept
-
-::: poll
-$$\log\Big(\frac{\hat{\pi}_{Poor}}{\hat{\pi}_{Excellent}}\Big) = -3.567 + 0.031 \cdot \text{Age} + 1.669 \cdot \text{SleepTrouble}$$
-:::
-
-::: question
-What is the interpretation for the intercept of this model, in terms of odds?
-:::
-
----
-
-## Interpretations: intercept
-
-::: poll
-$$\log\Big(\frac{\hat{\pi}_{Poor}}{\hat{\pi}_{Excellent}}\Big) = -3.567 + 0.031 \cdot \text{Age} + 1.669 \cdot \text{SleepTrouble}$$
-:::
-
-::: nonincremental
-The odds a 0 year-old person without sleep trouble rates themselves as having poor health versus excellent health are 0.028 (exp(-3.567)).
-
--   Would need to mean-center age for the intercept to have a meaningful interpretation.
-:::
-
----
-
-## Confidence Interval for Sleep Trouble
-
-```{r}
-#| echo: false
-#| fig-width: 3
-tidy(health_m, conf.int = TRUE, exponentiate = FALSE) %>%
-  filter(y.level == "Poor") %>%
-  dplyr::select(y.level, term, estimate, p.value, 
-                conf.low, conf.high) %>%
-  kable(digits = 3, format = "markdown")
-```
-
-We are 95% confident that, if someone has trouble sleeping, the odds the person rates themselves as poor health vs excellent health will multiply by 3.735 (exp(1.318)) to 7.538 (exp(2.020)), holding age constant.
-
----
-
-### Visualization: forest plots {.smaller}
-
-::: {.panel-tabset}
-
-### Code
+## Computational Setup
 
 ```{r}
 #| echo: true
 #| eval: false
-model_coef <- tidy(health_m, exponentiate = TRUE, conf.int = TRUE) %>%
-  filter(y.level =="Poor")
-ggplot(data = model_coef, aes(x = term, y = estimate)) +
-  geom_point() +
-  geom_hline(yintercept = 1, lty = 2) + 
-  geom_pointrange(aes(ymin = conf.low, ymax = conf.high))+
-  labs(title = "Exponentiated model coefficients") + 
-  coord_flip()
+# load packages
+library(tidyverse)
+library(tidymodels)
+library(openintro)
+library(knitr)
+library(RColorBrewer)
 ```
-
-### Output
-
-```{r}
-#| echo: false
-#| eval: true
-model_coef <- tidy(health_m, exponentiate = TRUE, conf.int = TRUE) %>%
-  filter(y.level =="Poor")
-ggplot(data = model_coef, aes(x = term, y = estimate)) +
-  geom_point() +
-  geom_hline(yintercept = 1, lty = 2) + 
-  geom_pointrange(aes(ymin = conf.low, ymax = conf.high))+
-  labs(title = "Exponentiated model coefficients") + 
-  coord_flip()
-```
-
-:::
 
 ---
 
-## Conclusion
-
-The data provide sufficient evidence that sleep trouble is a statistically significant predictor of rating oneself as "Poor" health vs. "Excellent", after accounting for age.
-
-The data provide sufficient evidence that age is a statistically significant predictor of rating oneself as "Poor" health vs. "Excellent", after accounting for sleep trouble.
+## Acupuncture example with code
 
 
 # Activity
@@ -848,9 +694,10 @@ The data provide sufficient evidence that age is a statistically significant pre
 ## Recap
 
 ::: nonincremental
--   Logistic regression in context of GLM
--   Multinomial logistic regression + inference, health rating example
--   Bingo game
+-   Motivation
+-   Odds and probabilities
+-   Logistic regression model
+-   Example
 :::
 
 ---
