@@ -104,10 +104,11 @@ movie_scores <- fandango %>%
 
 ## Example: movie ratings data 
 
-The data set contains the critics' score (**`critics`**)  and audience score (**`audience`**) for 146 movies rated on rottentomatoes.com.
+Dataset contains critics' score (**`critics`**)  and audience score (**`audience`**) for 146 movies rated on rottentomatoes.com.
 
 ```{r}
 #| echo: false
+#| fig-width: 10
 ggplot(data = movie_scores, mapping = aes(x = critics, y = audience)) +
   geom_point(alpha = 0.5) + 
   labs(x = "Critics Score" , 
@@ -123,6 +124,7 @@ We fit a linear regression model to describe the relationship between the critic
 
 ```{r}
 #| echo: false
+#| fig-width: 10
 ggplot(data = movie_scores, mapping = aes(x = critics, y = audience)) +
   geom_point(alpha = 0.5) + 
   geom_smooth(method = "lm", color = "coral2", se = FALSE) +
@@ -135,7 +137,7 @@ ggplot(data = movie_scores, mapping = aes(x = critics, y = audience)) +
 
 ---
 
-## Dichotomous outcomes  {.smaller}
+## Binary outcomes  {.smaller}
 
 ::: nonincremental
 - Now, what if we had a 0/1 outcome instead?
@@ -146,6 +148,7 @@ ggplot(data = movie_scores, mapping = aes(x = critics, y = audience)) +
 
 ```{r}
 #| echo: false
+#| fig-width: 8.5
 set.seed(56)
 dat <- tibble(x=runif(100, -5, 10),
                   p=exp(-2+1*x)/(1+exp(-2+1*x)),
@@ -175,6 +178,7 @@ ggplot() +
 :::
 ```{r}
 #| echo: false
+
 ggplot() + 
   geom_point(data = dat, aes(x, y), alpha = 0.5) +
   geom_line(data = dat2 %>% filter(`Regression model` == "linear"), aes(x, y, linetype = `Regression model`)) +
@@ -191,12 +195,16 @@ ggplot() +
 ## Linear vs. logistic regression {.smaller}
 
 ::: nonincremental
--   Logistic regression (dashed curve) follows data closely and always produces predicted probabilities between 0 and 1. 
+-   Logistic regression (dashed curve) follows data more closely.
+-   Always produces predicted probabilities between 0 and 1. 
+-   For this reason, we will focus on logistic regression for modeling binary or binomial responses. 
 :::
 
 
 ```{r}
 #| echo: false
+#| fig-height: 3
+#| fig-width: 6
 ggplot() + 
   geom_point(data = dat, aes(x, y), alpha = 0.5) +
   geom_line(data = dat2, aes(x, y, linetype = `Regression model`)) +
@@ -216,50 +224,61 @@ The solid line is a linear regression fit with least squares to the probability 
 
 ::: nonincremental
 - **Bernoulli**: $Y$ can take one of two values, success ($Y=1$) or failure ($Y=0$) 
-  - Let $P(Y=1)=\pi$, and $P(Y=0) = 1-\pi$
+  - $P(Y=1)=\pi$, and $P(Y=0) = 1-\pi$
   - Then $Y \sim \text{Bernoulli}(\pi)$
-    - $P(Y=y) = \pi^y (1-\pi)^{1-y}$ for $y=0, 1$
+  - $P(Y=y) = \pi^y (1-\pi)^{1-y}$ for $y=0, 1$
 - **Binomial**: $Y$ is the number of successes in $n$ bernoulli trials, each with probability of success $\pi$ 
-  - $Y \sim \text{Binomial},n, \pi)$ 
+  - $Y \sim \text{Binomial}(n, \pi)$ 
   - $P(Y=y) = {n \choose y} \pi^y(1-\pi)^{n-y}$ for $y=0, 1, \ldots, n$
 :::
 
+
+
+
 ---
 
-## Binomial or Bernoulli? {.smallish}
+## Binomial or Bernoulli? {.smaller}
 
-::: nonincremental
+For the following research questions, identify if the outcome of a single observation from the study is binomial or bernoulli. In pairs, submit answers on the survey via the QR code. 
 
-1. Is exposure to a particular chemical associated with a cancer diagnosis?
-2. Absenteeism data are collected for 146 randomly selected students in New South Wales, Australia across one school year. Are demographic characteristics of children associated with absenteeism? 
-
-To submit answers: $\quad \quad \quad \quad \quad$ or click [here](https://forms.gle/Y8fwCZz3svXuQV8G6). 
+::: nonincremental 
+1. Is exposure to a particular air pollutant associated with probability that an individual is diagnosed with lung cancer?
+2. At an elementary school, absenteeism data are collected for students across one school year. Are individual demographic characteristics associated with proportion of days a student is absent during a school year? 
+3. A health survey asks individuals to self-rate their current health as "Poor", "Fair", "Good", or "Excellent". Do lifestyle factors affect probability of an individual self-rating their health as at least "Good"? (i.e. "Good" or "Excellent" vs. "Poor" or "Fair).
 :::
 
-![](./img/qr_binomial_bernoulli_quiz.png){.absolute bottom="20" left="300" width="200" height="300"}
+
+
+![](./img/qr_binomial_bernoulli_quiz.png){.absolute top="150" right="-250" width="240" height="350"}
 
 ```{r}
 #| echo: false
-library(countdown)
-countdown(minutes = 1,
+countdown(minutes = 2,
           seconds = 30,
           margin = "1.25%")
 ```
 
+::: {.notes}
+or click [here](https://forms.gle/Y8fwCZz3svXuQV8G6).
+:::
 
 ---
 
-## Binomial or Bernoulli? Answers {.smallish}
+## Binomial or Bernoulli? Answers {.smaller}
 
 ::: incremental
 
-1. Is exposure to a particular chemical associated with a cancer diagnosis?
+1. Is exposure to a particular air pollutant associated with probability that an individual is diagnosed with lung cancer?
 
-- Bernoulli: The outcome is whether or not a person was diagnosed with cancer.
+- Bernoulli: The outcome is whether or not a person was diagnosed with lung cancer.
 
-2. Absenteeism data are collected for 146 randomly selected students in New South Wales, Australia across one school year. Are demographic characteristics of children associated with absenteeism? 
+2. At an elementary school, absenteeism data are collected for students across one school year. Are individual demographic characteristics associated with percent of days a student is absent during one school year? 
 
 - Binomial: The outcome is the number of days a student was absent out of $n$ days in a school year. 
+
+3. A health survey asks individuals to self-rate their current health as "Poor", "Fair", "Good", or "Excellent". Do lifestyle factors affect probability of an individual self-rating their health as at least "Good"? (i.e. "Good" or "Excellent" vs. "Poor" or "Fair).
+
+- Bernoulli: Each observation is whether or not an individual self-rates their health as "Good" or "Excellent" vs. "Poor" or "Fair on the survey.
 
 :::
 
@@ -267,27 +286,47 @@ countdown(minutes = 1,
 
 ## Brainstorming predictors
 
-In groups of 3-4, brainstorm some predictors for the following outcomes. 
+In groups, brainstorm some predictors for the following outcomes. 
+
 ::: nonincremental
-1. $Y$ = whether or not teenagers get 7+ hours of sleep per night.
-2. $Y$ = whether or not basketball players make their free-throw shots during a game.
-3. $Y$ = whether or not acupuncture treatment provides pain-relief for individuals with migraines.
-4. $Y$ = Whether a person self-rates their health status as "Good" or "Poor". 
+1. Whether or not teenagers get 7+ hours of sleep per night.
+2. Whether or not basketball players make their free-throw shots during a game.
+3. Whether or not acupuncture treatment provides pain-relief for individuals with migraines.
+4. Whether a person self-rates their health status as "Good" or "Poor" on a health survey. 
 :::
+
+```{r}
+#| echo: false
+countdown(minutes = 2,
+          margin = "1.25%")
+```
 
 ---
 
 
-## Logistic regression setup
+## Setup: probabilities and odds
 ::: nonincremental
--   Suppose response $Y$ takes value 1 with probability $\pi$ and value 0 with probability $1-\pi$. Let $X$ be a predictor.
+-   Suppose response $Y$ takes value 1 or 0 
+-   Probability of success = $P(Y=1) = \pi$
+-   Probability of failure = $P(Y=0) = 1-\pi$
+-   Odds = $\frac{p(\text{success})}{p(\text{failure})} = \frac{\pi}{1-\pi}$
+-   Example: If $p(\text{win}) = .6$, then $\text{odds}(\text{win}) = \frac{.6}{1-.6} = \frac{.6}{.4} = 1.5$.
+-   In other words, the probability of winning is 1.5 times the probability of losing. 
+:::
 
--   **odds** that $Y=1$ = $\frac{\pi}{1-\pi}$: 
--   Example: If $p(\text{win}) = .6$, then $\text{odds}(\text{win}) = \frac{.6}{1-.6} = 1.5$.
+---
 
--   **log odds** = $\log\big(\frac{\pi}{1-\pi}\big)$
+## Log odds
 
--   How do we get from $\pi$ to $\log\big(\frac{\pi}{1-\pi}\big)$? With the **logit transformation**.
+::: nonincremental
+- Odds are difficult to model, since their range is from 0 to $\infty$. 
+- So, we model log odds instead. 
+- Log odds = $\log\big(\frac{\pi}{1-\pi}\big) = \text{logit}(\pi)$
+- The logit function takes values between 0 and 1 (probabilities) and maps them to a range of - $\infty$ to + $\infty$. 
+
+
+
+
 
 :::
 
@@ -300,20 +339,80 @@ acc tournament march 7-11.
 
 ---
 
+## Probability, odds, and log odds
 
-## Odds to probabilities
+| probability | odds   | log odds |
+|-------------|:-------|:--------:|
+| .01         | .01    |     -4.60|
+| .05         | .05    |     -2.94|
+| .10         |  .11   |     -2.20|
+| .20         |  .25   |     -2.38|
+| .30         |  .43   |     -0.84|
+| .40         |  .67   |     -0.41|
+| .50         |  1.00  |      0.00|
+| .60         |  1.50  |      0.41|
+
+
+
+---
+
+## From log odds to probability
 
 ::: nonincremental
-- We've seen how to get from probability to odds, now how about odds to probability?
+- In a logistic model, we are often interested in modeling $\pi$. 
+- How can we get from log odds back to $\pi$?
+::: 
+
+---
+
+## From log odds to probability {.smaller}
+
+:::: {.columns}
+
+::: {.column width="60%"}
+
+::: incremental
+$$
+\begin{eqnarray*}
+\omega &=& \log\Big(\frac{\pi}{1-\pi}\Big) \\
+\exp(\omega) &=& \exp\log\Big(\frac{\pi}{1-\pi}\Big) \\
+\exp(\omega) &=& \frac{\pi}{1-\pi}\\
+\exp(\omega)(1-\pi) &=& \pi\\
+\exp(\omega)-\pi \exp(\omega) &=& \pi\\
+\exp(\omega)&=& \pi + \pi \exp(\omega) \\
+\exp(\omega)&=& \pi(1 + \exp(\omega)) \\
+\frac{\exp(\omega)}{1 + \exp(\omega)}&=& \pi 
+\end{eqnarray*}
+$$
+:::
 :::
 
-**Odds**
+::: {.column width="35%"}
 
-$$\omega = \frac{\pi}{1-\pi}$$
 
-**Probability**
 
-$$\pi = \frac{\omega}{1+\omega}$$
+:::
+
+::::
+
+---
+
+## From log odds to probability {.smaller}
+
+$$
+\begin{eqnarray*}
+\omega &=& \log\Big(\frac{\pi}{1-\pi}\Big) \\
+\exp(\omega) &=& \exp\log\Big(\frac{\pi}{1-\pi}\Big) \\
+\exp(\omega) &=& \frac{\pi}{1-\pi}\\
+\exp(\omega)(1-\pi) &=& \pi\\
+\exp(\omega)-\pi \exp(\omega) &=& \pi\\
+\exp(\omega)&=& \pi + \pi \exp(\omega) \\
+\exp(\omega)&=& \pi(1 + \exp(\omega)) \\
+\frac{\exp(\omega)}{1 + \exp(\omega)}&=& \pi 
+\end{eqnarray*}
+$$
+
+
 
 ---
 
@@ -469,72 +568,6 @@ For person 1:
 predicted probability = 
 
 $$\hat{\pi} = \frac{\exp{(-1.1939)}}{1+\exp{(-1.1939)}} = .232$$ 
-
-
----
-
-## Logistic regression: a GLM {.small}
-
-::: nonincremental
--   Logistic regression is a **generalized linear model** in which we can analyze data with a dichotomous response with  $P(\text{success}=\pi)$.
--   **Bernoulli**: Responses are either success $(Y=1)$ or failure $(Y=0)$
-
-$$P(Y=y) = \pi^y(1-\pi)^{1-y}, \quad y=0, 1$$
-
--   **Binomial**: Each observation has $n$ bernoulli trials, each with $P(\text{success})=\pi$.
-
-$$P(Y=y) = {n \choose y}\pi^y(1-\pi)^{(n-y)} $$
-:::
-
-
----
-
-
-
----
-
-
-
-## Exponential form {.smallish}
-
-A bernoulli random variable can be written in one-parameter exponential family form, $f(y;\theta) = \exp{[a(y)b(\theta) + c(\theta) + d(y)]}$
-
-**Bernoulli**
-
-$$f(y;\pi) = \exp\Big[y \log \Big(\frac{\pi}{1-\pi}\Big) + \log(1-\pi)\Big]$$
-
-
-::: question
-What are $a(y), b(\pi), c(\pi)$, and $d(y)$?
-:::
-
-```{r}
-#| echo: false
-library(countdown)
-countdown(minutes = 1, 
-          margin = "1.25%")
-```
-
-
-
----
-
-## Exponential form {.smallish}
-
-A bernoulli random variable can be written in one-parameter exponential family form, $f(y;\theta) = \exp{[a(y)b(\theta) + c(\theta) + d(y)]}$
-
-**Bernoulli**
-
-$$f(y;\pi) = \exp\Big[y \log \Big(\frac{\pi}{1-\pi}\Big) + \log(1-\pi)\Big]$$
-
-
-::: question
-What are $a(y), b(\pi), c(\pi)$, and $d(y)$?
-:::
-
-$a(y) = y$, $b(\pi)= \log \Big(\frac{\pi}{1-\pi}\Big)$, $c(\pi) = \log(1-\pi)$, and $d(y) = 0$.
-
-$b(\pi)$ is the **canonical link function**. 
 
 
 ---
