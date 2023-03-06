@@ -67,6 +67,7 @@ I'm assuming you're familiar with:
 
 ::: nonincremental
 -   Linear regression
+-   Multiple linear regression
 -   Bernoulli and binomial distributions
 -   R and tidyverse
 :::
@@ -87,7 +88,8 @@ library(RColorBrewer)
 
 ::: nonincremental
 - Linear regression is used to describe the relationship between a quantitative predictor and a quantitative response variable. 
-- Estimate the slope and intercept of the regression line using least squares method. 
+- Estimate the slope(s) and intercept of the regression function, including conditional interpretation when using more than one predictor.
+- Obtain parameter estimates using either the principle of least squares or maximum likelihood 
 - Interpret slope and intercept. 
 :::
 
@@ -120,7 +122,7 @@ ggplot(data = movie_scores, mapping = aes(x = critics, y = audience)) +
 
 ## A linear model for movie ratings
 
-We fit a linear regression model to describe the relationship between the critics score and audience score.
+We fit a linear regression model to describe how well critics' scores correspond with audience scores.
 
 ```{r}
 #| echo: false
@@ -140,10 +142,11 @@ ggplot(data = movie_scores, mapping = aes(x = critics, y = audience)) +
 ## Binary outcomes  {.smaller}
 
 ::: nonincremental
-- Now, what if we had a 0/1 outcome instead?
-- Suppose we observe whether or not a basketball player makes a free throw shot. 
-- Let $Y=1$ if they make the shot, and $Y=0$ if they miss. 
-- Can we fit a linear regression model?
+- Now, what if we had a binary (0/1 = no/yes = failure/success) outcome instead?
+- Suppose we want to estimate probability of making a free throw shot. We observe 100 free throw attempts, and assume independence. 
+  - Let $Y=1$ if they make the shot, and $Y=0$ if they miss.
+  - Let X be some covariate of interest.
+  - Can we fit a linear regression model?
 :::
 
 ```{r}
@@ -172,13 +175,14 @@ ggplot() +
 
 ::: nonincremental
 - Linear regression is a poor fit to the data.
-- Here, we'd like to model the probability of success, not the actual $Y$ values. 
-- Linear model predicts values above 1 and below 0. 
+- Here, we'd like to estimate the probability of success, not the actual $Y$ values. 
+- Linear model can predict values above 1 and below 0. 
 - We can do better!
 :::
 ```{r}
 #| echo: false
-
+#| fig-height: 4
+#| fig-width: 8
 ggplot() + 
   geom_point(data = dat, aes(x, y), alpha = 0.5) +
   geom_line(data = dat2 %>% filter(`Regression model` == "linear"), aes(x, y, linetype = `Regression model`)) +
@@ -197,14 +201,14 @@ ggplot() +
 ::: nonincremental
 -   Logistic regression (dashed curve) follows data more closely.
 -   Always produces predicted probabilities between 0 and 1. 
--   For this reason, we will focus on logistic regression for modeling binary or binomial responses. 
+-   For this reason (and others), we will focus on logistic regression for modeling binary or binomial responses. 
 :::
 
 
 ```{r}
 #| echo: false
-#| fig-height: 3
-#| fig-width: 6
+#| fig-height: 4
+#| fig-width: 8
 ggplot() + 
   geom_point(data = dat, aes(x, y), alpha = 0.5) +
   geom_line(data = dat2, aes(x, y, linetype = `Regression model`)) +
@@ -220,7 +224,7 @@ The solid line is a linear regression fit with least squares to the probability 
 
 ---
 
-### Bernoulli + binomial random variables {.smaller}
+### Bernoulli and binomial random variables {.smaller}
 
 ::: nonincremental
 - **Bernoulli**: $Y$ can take one of two values, success ($Y=1$) or failure ($Y=0$) 
@@ -242,8 +246,8 @@ The solid line is a linear regression fit with least squares to the probability 
 For the following research questions, identify if the outcome of a single observation from the study is binomial or bernoulli. In pairs, submit answers on the survey via the QR code. 
 
 ::: nonincremental 
-1. Is exposure to a particular air pollutant associated with probability that an individual is diagnosed with lung cancer?
-2. At an elementary school, absenteeism data are collected for students across one school year. Are individual demographic characteristics associated with proportion of days a student is absent during a school year? 
+1. Is exposure to a particular pollutant over a 5-year period a risk factor for an individual's diagnosis of lung cancer?
+2. At an elementary school, absenteeism data are collected for students across 100 randomly selected days in a school year. Do percent of days absent differ among students with different demographic characteristics?
 3. A health survey asks individuals to self-rate their current health as "Poor", "Fair", "Good", or "Excellent". Do lifestyle factors affect probability of an individual self-rating their health as at least "Good"? (i.e. "Good" or "Excellent" vs. "Poor" or "Fair).
 :::
 
@@ -276,23 +280,23 @@ or click [here](https://forms.gle/Y8fwCZz3svXuQV8G6).
 
 - Binomial: The outcome is the number of days a student was absent out of $n$ days in a school year. 
 
-3. A health survey asks individuals to self-rate their current health as "Poor", "Fair", "Good", or "Excellent". Do lifestyle factors affect probability of an individual self-rating their health as at least "Good"? (i.e. "Good" or "Excellent" vs. "Poor" or "Fair).
+3. A survey asks individuals to self-rate their current health as "Poor", "Fair", "Good", or "Excellent". Do lifestyle factors affect probability of an individual self-rating their health as at least "Good"?
 
-- Bernoulli: Each observation is whether or not an individual self-rates their health as "Good" or "Excellent" vs. "Poor" or "Fair on the survey.
+- Bernoulli: Each observation is whether or not an individual self-rates their health as {"Good" or "Excellent"} vs. {"Poor" or "Fair"} on the survey question.
 
 :::
 
 ---
 
-## Brainstorming predictors
+## Brainstorming predictors {.smallish}
 
-In groups, brainstorm some predictors for the following outcomes. 
+In groups, brainstorm some predictors for the probability of the following outcomes. 
 
 ::: nonincremental
-1. Whether or not teenagers get 7+ hours of sleep per night.
-2. Whether or not basketball players make their free-throw shots during a game.
-3. Whether or not acupuncture treatment provides pain-relief for individuals with migraines.
-4. Whether a person self-rates their health status as "Good" or "Poor" on a health survey. 
+1. Whether a randomly selected teenager get 7+ hours of sleep per night in a 1-week period.
+2. Whether or not a basketball player makes a free-throw shots during a game.
+3. Whether or not a targeted acupuncture treatment provides pain-relief for individuals with migraines, as compared to a placebo treatment.
+4. Whether a person self-rates their health status as at least "Good" on a single health survey question at a routine doctor visit. 
 :::
 
 ```{r}
@@ -300,6 +304,7 @@ In groups, brainstorm some predictors for the following outcomes.
 countdown(minutes = 2,
           margin = "1.25%")
 ```
+
 
 ---
 
@@ -322,7 +327,7 @@ countdown(minutes = 2,
 - Odds are difficult to model, since their range is from 0 to $\infty$. 
 - So, we model log odds instead. 
 - Log odds = $\log\big(\frac{\pi}{1-\pi}\big) = \text{logit}(\pi)$
-- The logit function takes values between 0 and 1 (probabilities) and maps them to a range of - $\infty$ to + $\infty$. 
+- The logit function takes values between 0 and 1 (probabilities) and maps them to a range of -$\infty$ to +$\infty$. 
 
 
 
@@ -339,8 +344,11 @@ acc tournament march 7-11.
 
 ---
 
-## Probability, odds, and log odds
+## Probability, odds, and log odds {.smallish}
 
+:::: {.columns}
+
+::: {.column width="60%"}
 | probability | odds   | log odds |
 |-------------|:-------|:--------:|
 | .01         | .01    |     -4.60|
@@ -351,7 +359,18 @@ acc tournament march 7-11.
 | .40         |  .67   |     -0.41|
 | .50         |  1.00  |      0.00|
 | .60         |  1.50  |      0.41|
+:::
 
+::: {.column width="40%"}
+
+::: nonincremental
+- When probabilities are small, they resemble the odds.
+- Odds range from 0 to infinitely large
+- Log odds range from $-\infty$ to $+\infty$.
+:::
+
+:::
+::::
 
 
 ---
@@ -359,7 +378,8 @@ acc tournament march 7-11.
 ## From log odds to probability
 
 ::: nonincremental
-- In a logistic model, we are often interested in modeling $\pi$. 
+- In a logistic model, we estimate log odds. 
+- However, once we fit the model, we are often interested in estimating $\pi$.
 - How can we get from log odds back to $\pi$?
 ::: 
 
@@ -397,34 +417,22 @@ $$
 
 ---
 
-## From log odds to probability {.smaller}
 
-$$
-\begin{eqnarray*}
-\omega &=& \log\Big(\frac{\pi}{1-\pi}\Big) \\
-\exp(\omega) &=& \exp\log\Big(\frac{\pi}{1-\pi}\Big) \\
-\exp(\omega) &=& \frac{\pi}{1-\pi}\\
-\exp(\omega)(1-\pi) &=& \pi\\
-\exp(\omega)-\pi \exp(\omega) &=& \pi\\
-\exp(\omega)&=& \pi + \pi \exp(\omega) \\
-\exp(\omega)&=& \pi(1 + \exp(\omega)) \\
-\frac{\exp(\omega)}{1 + \exp(\omega)}&=& \pi 
-\end{eqnarray*}
-$$
-
-
-
----
-
-## From odds to probabilities
+## Logistic model {.smaller}
 
 ::: nonincremental
--   **logistic model**: $\log\big(\frac{\pi}{1-\pi}\big) = \beta_0 + \beta_1 X$ 
--   **odds** $= \exp \{\log(\frac{\pi}{1-\pi})\}= \frac{\pi}{1-\pi}$
 
-- **probability model**: combining this w/ previous slide, we get:
+::: poll
+$$\text{logit}(\pi) = \log\big(\frac{\pi}{1-\pi}\big) = \beta_0 + \beta_1 X$$ 
+:::
 
-$$\text{probability} = \pi = \frac{\exp\{\beta_0 + \beta_1 X\}}{1+ \exp\{\beta_0 + \beta_1 X\}}$$
+- **Assumptions**
+  1. **Binary responses**: $Y_i$ is a binary variable where $Y_i \sim \text{Bernoulli}(\pi_i)$ for $i=1, \ldots, n$.
+  2. **Independence**: $Y_i$ is independent from $Y_j$ for all $i \neq j$.
+  3. **Linearity**: Log of the odds ratio, $\log (\frac{\pi}{1-\pi})$, is a linear in $\beta_0$, $\beta_1$.
+- Combining with previous slide, we get: 
+
+$$\pi = \frac{\exp\{\beta_0 + \beta_1 X\}}{1+ \exp\{\beta_0 + \beta_1 X\}}$$
 :::
 
 ::: {.notes}
@@ -433,16 +441,30 @@ We can use our logistic regression model to calculate probability.
 
 ---
 
-## Acupuncture example 
+## Acupuncture example {.smaller}
 
+:::: {.columns}
+
+::: {.column width="60%"}
 ::: nonincremental
 -   The `openintro::migraine` dataset is from a study about ear acupuncture in treatment of migraine attacks.
--   Treatment (area of ear associated with headache) vs. "placebo" treatment (area of ear associated with sciatica). 
+-   89 individuals received either acupuncture treatment vs. "placebo" treatment (sham acupuncture on area of ear assoc. w/ sciatica). 
 -   **Response**: `pain_free` = yes or no
 -   **Predictor**: `group` = control or treatment
 -   **Research question**: Is acupuncture treatment associated with a reduction of pain?
 :::
+:::
 
+::: {.column width="40%"}
+
+:::
+::::
+
+![](./img/acu_ear.png){.absolute top="80" right="0" width="400" height="350"}
+
+::: aside
+G. Allais et al. Ear acupuncture in the treatment of migraine attacks: a randomized trial on the efficacy of appropriate versus inappropriate acupoints. In: Neurological Sci. 32.1 (2011), pp. 173-175.
+:::
 
 ---
 
@@ -478,11 +500,41 @@ internal part of the antitragus (area M) on the same side of pain. The aim of th
 
 ---
 
-## Modeling being pain-free
+## Setting up the model
+
+::: nonincremental
+- Want to fit logistic regression model to acupuncture data.
+- Let $Y_i$ be the response for individual $i$, i.e. whether the person reported being pain-free post-treatment.
+- Let $P(Y_i = 1) = \pi_i$.
+- Let $I(\cdot)$ be an indicator function.
+$$\text{logit}(\pi_i) = \log\Big(\frac{\pi_i}{1-\pi_i}\Big) = \beta_0 + 
+\beta_1\cdot I_i(\text{treatment})$$
+
+:::
+
+---
+
+## Computational Setup
 
 ```{r}
 #| echo: true
+#| eval: false
+# load packages
+library(tidyverse)
+library(tidymodels)
+library(openintro)
+library(knitr)
+library(RColorBrewer)
+```
 
+
+
+---
+
+## Fit the model
+
+```{r}
+#| echo: true
 acu_model <- glm(pain_free ~ group, 
                   data  = migraine, 
                  family = "binomial")
@@ -492,110 +544,105 @@ acu_model %>%
 ```
 
 ::: poll
-$$\log\Big(\frac{\hat{\pi}}{1-\hat{\pi}}\Big) = -3.091 + 1.897 \times \text{treatment}$$
+$$\log\Big(\frac{\hat{\pi}_i}{1-\hat{\pi}_i}\Big) = -3.091 + 1.897 \cdot I(\text{treatment})$$
 :::
 
 
 
 ---
 
-## Interpreting **treatment** coefficient - log odds
+## Log-odds by treatment group 
 
-```{r}
-#| echo: false
-acu_model %>%
-  tidy %>%
-  kable(digits = 3)
-```
-The **log-odds** of being pain-free post-treatment are expected to be 1.897 higher for those who received treatment compared to those who did not receive treatment. 
+
+::: poll
+$$\log\Big(\frac{\hat{\pi}_i}{1-\hat{\pi}_i}\Big) = -3.091 + 1.897 \cdot I(\text{treatment})$$
+:::
+
+::: nonincremental
+- For someone in the control group, $\log\Big(\frac{\hat{\pi}_i}{1-\hat{\pi}_i}\Big) = -3.091$.
+- For someone in the treatment group, $\log\Big(\frac{\hat{\pi}_i}{1-\hat{\pi}_i}\Big) = -3.091 + 1.897 = -1.194$.
+- $\beta_1=1.897$ measures the difference in log-odds for someone in the treatment group vs. the control group. 
+:::
 
 
 ---
 
-## Interpreting **treatment** coefficient - odds
-
-```{r}
-#| echo: false
-acu_model %>%
-  tidy %>%
-  kable(digits = 3)
-```
-
-The **odds** of being pain-free post-treatment for those who received treatment are expected to be 6.67 (i.e. exp(1.897)) times the odds for those who received the control.
-
----
+## Interpretations by treatment group 
 
 
-## Predicted log odds
+::: poll
+$$\log\Big(\frac{\hat{\pi}_i}{1-\hat{\pi}_i}\Big) = -3.091 + 1.897 \cdot I(\text{treatment})$$
+:::
 
-```{r}
-#| echo: false
-#| eval: true
+::: nonincremental
+- For those in the treatment group, the **log-odds** of being pain-free post-treatment are expected to be 1.897 higher compared to those in the control group. 
+- For those in the treatment group, the **odds** of being pain-free post-treatment are expected to be 6.67 (i.e. exp(1.897)) times the odds of those in the control group.
+:::
 
-predict(acu_model) [1:7]
-```
-
-```{r}
-#| echo: true
-#| eval: false
-predict(acu_model)
-```
-For person 1:
-
-the predicted odds = 
-
-$$\hat{\omega} = \frac{\hat{\pi}}{{1-\hat{\pi}}} = \exp(-1.1939) = 0.303$$
 
 ---
 
-## Predicted probabilities
+
+## Predicted log odds and odds {.smallish}
 
 ```{r}
-#| echo: true
-#| eval: false
-predict(acu_model, 
-        type = "response") #<<
+predict(acu_model)[1:7]
 ```
 
+
+
+::: nonincremental
+- We can use the `predict` function to get the predicted log odds for individuals. 
+- Person 1 is in the treatment group.
+- For person 1, predicted **log odds** = -1.1939.
+- Then, we can exponentiate this value to get the predicted odds.
+- For person 1, predicted **odds** = exp(-1.1939) = 0.303.
+:::
+
+
+---
+
+## Predicted probabilities, treatment
+
 ```{r}
-#| echo: false
 predict(acu_model, 
         type = "response")[1:7]
 ```
 
-For person 1:
+::: nonincremental
+- We can use the `type = "response"` option to print the predicted probabilities instead. 
+- For person 1 (treatment group), predicted probability = 
+:::
 
-predicted probability = 
-
-$$\hat{\pi} = \frac{\exp{(-1.1939)}}{1+\exp{(-1.1939)}} = .232$$ 
+$$\hat{\pi}_i = \frac{\exp{(-1.1939)}}{1+\exp{(-1.1939)}} = .232$$
 
 
 ---
 
+## Predicted probabilities, control {.smallish}
 
-## Assumptions of logistic regression
-
+```{r}
+predict(acu_model)[83:89]
+predict(acu_model, 
+        type = "response")[83:89]
+```
 
 ::: nonincremental
-1. **Binary responses**: Response is dichotomous (only takes on two values), or is the sum of dichotomous responses.
-2. **Independence**: Observations independent of one another. 
-3. **Variance structure**: Variance of binomial random variable is $n\pi(1-\pi)$, variance highest when $\pi=0.5$.
-4. **Linearity**: Log of the odds ratio, $\log (\frac{\pi}{1-\pi})$, is a linear function of $x$.
+- We can compare this to the predicted probability for an individual in the control group.
+- For person 83 (control group), predicted probability =  
 :::
 
-
-
-
-
+$$\hat{\pi}_i = \frac{\exp{(-3.091)}}{1+\exp{(-3.091)}} = .043$$
 ---
 
 ## Hypothesis test for $\beta_j$
 
-**Hypotheses**: $H_0: \beta_j = 0$ vs $H_A: \beta_j \neq 0$
 
 ::: nonincremental
+- We've seen that $\beta_1$ estimates the difference in log odds between those in the treatment group versus those in the control. 
+- Is $\beta_1$ large enough to determine statistical significance?
+- **Hypotheses**: $H_0: \beta_j = 0$ vs $H_A: \beta_j \neq 0$
 -   $H_0$: There is no linear relationship between the variable of interest and the log-odds of the response.
-
 -   $H_A$: There **is** a linear relationship between the variable of interest and the log-odds of the response.
 :::
 
@@ -626,19 +673,19 @@ This is an interval for the change in log-odds of the response for a one-unit in
 
 ---
 
-## Interpretation in terms of odds
+## CI interpretation in terms of odds
 
 The change in **odds** for every one-unit change in $x_j$. 
 
-$$\exp{\hat{\beta}_j \pm z^* SE_{\hat{\beta}_j}}$$
+$$\exp\Big(\hat{\beta}_j \pm z^* SE_{\hat{\beta}_j}\Big)$$
 
-**Interpretation**: We are $C$% confident that for every one-unit increase in $x_j$, the odds multiply by a factor of $\big\{\exp{\hat{\beta}_j - z^* SE_{\hat{\beta}_j}}\big\}$ to $\big\{\exp{\hat{\beta}_j + z^* SE_{\hat{\beta}_j}}\big\}$, holding all other variables constant. 
+**Interpretation**: We are $C$% confident that for every one-unit increase in $x_j$, the odds multiply by a factor of $\exp\Big({\hat{\beta}_j - z^* SE_{\hat{\beta}_j}}\big)$ to $\exp\Big({\hat{\beta}_j + z^* SE_{\hat{\beta}_j}}\big)$, holding all other variables constant. 
 
 
 
 ---
 
-## Let's look at the coefficient for treatment
+## Test statistic
 
 ```{r}
 #| echo: false
@@ -653,7 +700,7 @@ $$z = \frac{1.897-0}{0.808} = 2.34778$$
 
 ---
 
-## Let's look at the coefficient for treatment
+## P-value
 
 ```{r}
 #| echo: false
@@ -675,7 +722,7 @@ $$P(|Z| > |2.34778|)$$
 
 ---
 
-## Let's look at the coefficient for treatment
+## Conclusion
 
 ```{r}
 #| echo: false
@@ -687,35 +734,14 @@ acu_model %>%
 **Conclusion**: Since the p-value is quite small, we reject $H_0$. The data provide sufficient evidence that the acupuncture treatment is a statistically significant predictor of being migraine-pain-free post-treatment.
 
 
----
-
-## Computational Setup
-
-```{r}
-#| echo: true
-#| eval: false
-# load packages
-library(tidyverse)
-library(tidymodels)
-library(openintro)
-library(knitr)
-library(RColorBrewer)
-```
-
----
-
-## Acupuncture example with code
-
-
 # Activity
 
 ## Regression Bingo Game
 
 ::: nonincremental
-- Pair up - two people per bingo card.
+- Form groups of 2-3 people per bingo card.
 - Each square on bingo card has a question.
 - "Answers" located throughout room. If you think you've found a correct answer, tear off answer and place it on the square. 
-  -   Write a note on your card about what the answer said
 - When you get bingo (3 in a row), shout it out and share your 3 question/answers. 
 - If you'd like to see any slide from this lecture, feel free to ask!
 

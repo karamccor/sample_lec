@@ -416,6 +416,7 @@
 <div>
 <ul>
 <li>Linear regression</li>
+<li>Multiple linear regression</li>
 <li>Bernoulli and binomial distributions</li>
 <li>R and tidyverse</li>
 </ul>
@@ -434,7 +435,8 @@
 <div>
 <ul>
 <li>Linear regression is used to describe the relationship between a quantitative predictor and a quantitative response variable.</li>
-<li>Estimate the slope and intercept of the regression line using least squares method.</li>
+<li>Estimate the slope(s) and intercept of the regression function, including conditional interpretation when using more than one predictor.</li>
+<li>Obtain parameter estimates using either the principle of least squares or maximum likelihood</li>
 <li>Interpret slope and intercept.</li>
 </ul>
 </div>
@@ -449,17 +451,20 @@
 <img data-src="lecture2_files/figure-revealjs/unnamed-chunk-6-1.png" width="960" class="r-stretch"></section>
 <section id="a-linear-model-for-movie-ratings" class="slide level2">
 <h2>A linear model for movie ratings</h2>
-<p>We fit a linear regression model to describe the relationship between the critics score and audience score.</p>
+<p>We fit a linear regression model to describe how well critics’ scores correspond with audience scores.</p>
 
 <img data-src="lecture2_files/figure-revealjs/unnamed-chunk-7-1.png" width="960" class="r-stretch"></section>
 <section id="binary-outcomes" class="slide level2 smaller">
 <h2>Binary outcomes</h2>
 <div>
 <ul>
-<li>Now, what if we had a 0/1 outcome instead?</li>
-<li>Suppose we observe whether or not a basketball player makes a free throw shot.</li>
+<li>Now, what if we had a binary (0/1 = no/yes = failure/success) outcome instead?</li>
+<li>Suppose we want to estimate probability of making a free throw shot. We observe 100 free throw attempts, and assume independence.
+<ul>
 <li>Let <span class="math inline">\(Y=1\)</span> if they make the shot, and <span class="math inline">\(Y=0\)</span> if they miss.</li>
+<li>Let X be some covariate of interest.</li>
 <li>Can we fit a linear regression model?</li>
+</ul></li>
 </ul>
 </div>
 
@@ -469,25 +474,25 @@
 <div>
 <ul>
 <li>Linear regression is a poor fit to the data.</li>
-<li>Here, we’d like to model the probability of success, not the actual <span class="math inline">\(Y\)</span> values.</li>
-<li>Linear model predicts values above 1 and below 0.</li>
+<li>Here, we’d like to estimate the probability of success, not the actual <span class="math inline">\(Y\)</span> values.</li>
+<li>Linear model can predict values above 1 and below 0.</li>
 <li>We can do better!</li>
 </ul>
 </div>
 
-<img data-src="lecture2_files/figure-revealjs/unnamed-chunk-9-1.png" width="960" class="r-stretch"></section>
+<img data-src="lecture2_files/figure-revealjs/unnamed-chunk-9-1.png" width="768" class="r-stretch"></section>
 <section id="linear-vs.-logistic-regression" class="slide level2 smaller">
 <h2>Linear vs.&nbsp;logistic regression</h2>
 <div>
 <ul>
 <li>Logistic regression (dashed curve) follows data more closely.</li>
 <li>Always produces predicted probabilities between 0 and 1.</li>
-<li>For this reason, we will focus on logistic regression for modeling binary or binomial responses.</li>
+<li>For this reason (and others), we will focus on logistic regression for modeling binary or binomial responses.</li>
 </ul>
 </div>
 <div class="cell">
 <div class="cell-output-display">
-<p><img data-src="lecture2_files/figure-revealjs/unnamed-chunk-10-1.png" width="576"></p>
+<p><img data-src="lecture2_files/figure-revealjs/unnamed-chunk-10-1.png" width="768"></p>
 </div>
 </div>
 <aside class="notes">
@@ -506,7 +511,7 @@
 </section>
 <section class="slide level2">
 
-<h3 class="smaller" id="bernoulli-binomial-random-variables">Bernoulli + binomial random variables</h3>
+<h3 class="smaller" id="bernoulli-and-binomial-random-variables">Bernoulli and binomial random variables</h3>
 <div>
 <ul>
 <li><strong>Bernoulli</strong>: <span class="math inline">\(Y\)</span> can take one of two values, success (<span class="math inline">\(Y=1\)</span>) or failure (<span class="math inline">\(Y=0\)</span>)
@@ -528,15 +533,15 @@
 <p>For the following research questions, identify if the outcome of a single observation from the study is binomial or bernoulli. In pairs, submit answers on the survey via the QR code.</p>
 <div>
 <ol type="1">
-<li>Is exposure to a particular air pollutant associated with probability that an individual is diagnosed with lung cancer?</li>
-<li>At an elementary school, absenteeism data are collected for students across one school year. Are individual demographic characteristics associated with proportion of days a student is absent during a school year?</li>
+<li>Is exposure to a particular pollutant over a 5-year period a risk factor for an individual’s diagnosis of lung cancer?</li>
+<li>At an elementary school, absenteeism data are collected for students across 100 randomly selected days in a school year. Do percent of days absent differ among students with different demographic characteristics?</li>
 <li>A health survey asks individuals to self-rate their current health as “Poor”, “Fair”, “Good”, or “Excellent”. Do lifestyle factors affect probability of an individual self-rating their health as at least “Good”? (i.e.&nbsp;“Good” or “Excellent” vs.&nbsp;“Poor” or “Fair).</li>
 </ol>
 </div>
 <p><img data-src="./img/qr_binomial_bernoulli_quiz.png" class="absolute" style="top: 150px; right: -250px; width: 240px; height: 350px; "></p>
 <div class="cell">
 <div class="cell-output-display">
-<div class="countdown" id="timer_21f9bea9" data-update-every="1" tabindex="0" style="right:0;bottom:0;margin:1.25%;">
+<div class="countdown" id="timer_541f75e2" data-update-every="1" tabindex="0" style="right:0;bottom:0;margin:1.25%;">
 <div class="countdown-controls"><button class="countdown-bump-down">−</button><button class="countdown-bump-up">+</button></div>
 <code class="countdown-time"><span class="countdown-digits minutes">02</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">30</span></code>
 </div>
@@ -572,27 +577,27 @@
 <li class="fragment">Binomial: The outcome is the number of days a student was absent out of <span class="math inline">\(n\)</span> days in a school year.</li>
 </ul>
 <ol start="3" type="1">
-<li class="fragment">A health survey asks individuals to self-rate their current health as “Poor”, “Fair”, “Good”, or “Excellent”. Do lifestyle factors affect probability of an individual self-rating their health as at least “Good”? (i.e.&nbsp;“Good” or “Excellent” vs.&nbsp;“Poor” or “Fair).</li>
+<li class="fragment">A survey asks individuals to self-rate their current health as “Poor”, “Fair”, “Good”, or “Excellent”. Do lifestyle factors affect probability of an individual self-rating their health as at least “Good”?</li>
 </ol>
 <ul>
-<li class="fragment">Bernoulli: Each observation is whether or not an individual self-rates their health as “Good” or “Excellent” vs.&nbsp;“Poor” or “Fair on the survey.</li>
+<li class="fragment">Bernoulli: Each observation is whether or not an individual self-rates their health as {“Good” or “Excellent”} vs.&nbsp;{“Poor” or “Fair”} on the survey question.</li>
 </ul>
 </div>
 </section>
-<section id="brainstorming-predictors" class="slide level2">
+<section id="brainstorming-predictors" class="slide level2 smallish">
 <h2>Brainstorming predictors</h2>
-<p>In groups, brainstorm some predictors for the following outcomes.</p>
+<p>In groups, brainstorm some predictors for the probability of the following outcomes.</p>
 <div>
 <ol type="1">
-<li>Whether or not teenagers get 7+ hours of sleep per night.</li>
-<li>Whether or not basketball players make their free-throw shots during a game.</li>
-<li>Whether or not acupuncture treatment provides pain-relief for individuals with migraines.</li>
-<li>Whether a person self-rates their health status as “Good” or “Poor” on a health survey.</li>
+<li>Whether a randomly selected teenager get 7+ hours of sleep per night in a 1-week period.</li>
+<li>Whether or not a basketball player makes a free-throw shots during a game.</li>
+<li>Whether or not a targeted acupuncture treatment provides pain-relief for individuals with migraines, as compared to a placebo treatment.</li>
+<li>Whether a person self-rates their health status as at least “Good” on a single health survey question at a routine doctor visit.</li>
 </ol>
 </div>
 <div class="cell">
 <div class="cell-output-display">
-<div class="countdown" id="timer_c8f9c4ad" data-update-every="1" tabindex="0" style="right:0;bottom:0;margin:1.25%;">
+<div class="countdown" id="timer_eb080ec7" data-update-every="1" tabindex="0" style="right:0;bottom:0;margin:1.25%;">
 <div class="countdown-controls"><button class="countdown-bump-down">−</button><button class="countdown-bump-up">+</button></div>
 <code class="countdown-time"><span class="countdown-digits minutes">02</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
 </div>
@@ -619,7 +624,7 @@
 <li>Odds are difficult to model, since their range is from 0 to <span class="math inline">\(\infty\)</span>.</li>
 <li>So, we model log odds instead.</li>
 <li>Log odds = <span class="math inline">\(\log\big(\frac{\pi}{1-\pi}\big) = \text{logit}(\pi)\)</span></li>
-<li>The logit function takes values between 0 and 1 (probabilities) and maps them to a range of - <span class="math inline">\(\infty\)</span> to + <span class="math inline">\(\infty\)</span>.</li>
+<li>The logit function takes values between 0 and 1 (probabilities) and maps them to a range of -<span class="math inline">\(\infty\)</span> to +<span class="math inline">\(\infty\)</span>.</li>
 </ul>
 </div>
 <aside class="notes">
@@ -636,8 +641,10 @@
           display:block!important;
       }</style></aside>
 </section>
-<section id="probability-odds-and-log-odds" class="slide level2">
+<section id="probability-odds-and-log-odds" class="slide level2 smallish">
 <h2>Probability, odds, and log odds</h2>
+<div class="columns">
+<div class="column" style="width:60%;">
 <table>
 <thead>
 <tr class="header">
@@ -689,12 +696,23 @@
 </tr>
 </tbody>
 </table>
+</div><div class="column" style="width:40%;">
+<div>
+<ul>
+<li>When probabilities are small, they resemble the odds.</li>
+<li>Odds range from 0 to infinitely large</li>
+<li>Log odds range from <span class="math inline">\(-\infty\)</span> to <span class="math inline">\(+\infty\)</span>.</li>
+</ul>
+</div>
+</div>
+</div>
 </section>
 <section id="from-log-odds-to-probability" class="slide level2">
 <h2>From log odds to probability</h2>
 <div>
 <ul>
-<li>In a logistic model, we are often interested in modeling <span class="math inline">\(\pi\)</span>.</li>
+<li>In a logistic model, we estimate log odds.</li>
+<li>However, once we fit the model, we are often interested in estimating <span class="math inline">\(\pi\)</span>.</li>
 <li>How can we get from log odds back to <span class="math inline">\(\pi\)</span>?</li>
 </ul>
 </div>
@@ -722,30 +740,22 @@
 </div>
 </div>
 </section>
-<section id="from-log-odds-to-probability-2" class="slide level2 smaller">
-<h2>From log odds to probability</h2>
-<p><span class="math display">\[
-\begin{eqnarray*}
-\omega &amp;=&amp; \log\Big(\frac{\pi}{1-\pi}\Big) \\
-\exp(\omega) &amp;=&amp; \exp\log\Big(\frac{\pi}{1-\pi}\Big) \\
-\exp(\omega) &amp;=&amp; \frac{\pi}{1-\pi}\\
-\exp(\omega)(1-\pi) &amp;=&amp; \pi\\
-\exp(\omega)-\pi \exp(\omega) &amp;=&amp; \pi\\
-\exp(\omega)&amp;=&amp; \pi + \pi \exp(\omega) \\
-\exp(\omega)&amp;=&amp; \pi(1 + \exp(\omega)) \\
-\frac{\exp(\omega)}{1 + \exp(\omega)}&amp;=&amp; \pi
-\end{eqnarray*}
-\]</span></p>
-</section>
-<section id="from-odds-to-probabilities" class="slide level2">
-<h2>From odds to probabilities</h2>
+<section id="logistic-model" class="slide level2 smaller">
+<h2>Logistic model</h2>
 <div>
+<div class="poll">
+<p><span class="math display">\[\text{logit}(\pi) = \log\big(\frac{\pi}{1-\pi}\big) = \beta_0 + \beta_1 X\]</span></p>
+</div>
 <ul>
-<li><p><strong>logistic model</strong>: <span class="math inline">\(\log\big(\frac{\pi}{1-\pi}\big) = \beta_0 + \beta_1 X\)</span></p></li>
-<li><p><strong>odds</strong> <span class="math inline">\(= \exp \{\log(\frac{\pi}{1-\pi})\}= \frac{\pi}{1-\pi}\)</span></p></li>
-<li><p><strong>probability model</strong>: combining this w/ previous slide, we get:</p></li>
+<li><strong>Assumptions</strong>
+<ol type="1">
+<li><strong>Binary responses</strong>: <span class="math inline">\(Y_i\)</span> is a binary variable where <span class="math inline">\(Y_i \sim \text{Bernoulli}(\pi_i)\)</span> for <span class="math inline">\(i=1, \ldots, n\)</span>.</li>
+<li><strong>Independence</strong>: <span class="math inline">\(Y_i\)</span> is independent from <span class="math inline">\(Y_j\)</span> for all <span class="math inline">\(i \neq j\)</span>.</li>
+<li><strong>Linearity</strong>: Log of the odds ratio, <span class="math inline">\(\log (\frac{\pi}{1-\pi})\)</span>, is a linear in <span class="math inline">\(\beta_0\)</span>, <span class="math inline">\(\beta_1\)</span>.</li>
+</ol></li>
+<li>Combining with previous slide, we get:</li>
 </ul>
-<p><span class="math display">\[\text{probability} = \pi = \frac{\exp\{\beta_0 + \beta_1 X\}}{1+ \exp\{\beta_0 + \beta_1 X\}}\]</span></p>
+<p><span class="math display">\[\pi = \frac{\exp\{\beta_0 + \beta_1 X\}}{1+ \exp\{\beta_0 + \beta_1 X\}}\]</span></p>
 </div>
 <aside class="notes">
 <p>We can use our logistic regression model to calculate probability.</p>
@@ -761,18 +771,28 @@
           display:block!important;
       }</style></aside>
 </section>
-<section id="acupuncture-example" class="slide level2">
+<section id="acupuncture-example" class="slide level2 smaller">
 <h2>Acupuncture example</h2>
+<div class="columns">
+<div class="column" style="width:60%;">
 <div>
 <ul>
 <li>The <code>openintro::migraine</code> dataset is from a study about ear acupuncture in treatment of migraine attacks.</li>
-<li>Treatment (area of ear associated with headache) vs.&nbsp;“placebo” treatment (area of ear associated with sciatica).</li>
+<li>89 individuals received either acupuncture treatment vs.&nbsp;“placebo” treatment (sham acupuncture on area of ear assoc. w/ sciatica).</li>
 <li><strong>Response</strong>: <code>pain_free</code> = yes or no</li>
 <li><strong>Predictor</strong>: <code>group</code> = control or treatment</li>
 <li><strong>Research question</strong>: Is acupuncture treatment associated with a reduction of pain?</li>
 </ul>
 </div>
-</section>
+</div><div class="column" style="width:40%;">
+
+</div>
+</div>
+<p><img data-src="./img/acu_ear.png" class="absolute" style="top: 80px; right: 0px; width: 400px; height: 350px; "></p>
+
+<aside><div>
+<p>G. Allais et al.&nbsp;Ear acupuncture in the treatment of migraine attacks: a randomized trial on the efficacy of appropriate versus inappropriate acupoints. In: Neurological Sci. 32.1 (2011), pp.&nbsp;173-175.</p>
+</div></aside></section>
 <section id="exploratory-data-analysis" class="slide level2">
 <h2>Exploratory Data Analysis</h2>
 <div class="question">
@@ -802,15 +822,39 @@
           display:block!important;
       }</style></aside>
 </section>
-<section id="modeling-being-pain-free" class="slide level2">
-<h2>Modeling being pain-free</h2>
+<section id="setting-up-the-model" class="slide level2">
+<h2>Setting up the model</h2>
+<div>
+<ul>
+<li>Want to fit logistic regression model to acupuncture data.</li>
+<li>Let <span class="math inline">\(Y_i\)</span> be the response for individual <span class="math inline">\(i\)</span>, i.e.&nbsp;whether the person reported being pain-free post-treatment.</li>
+<li>Let <span class="math inline">\(P(Y_i = 1) = \pi_i\)</span>.</li>
+<li>Let <span class="math inline">\(I(\cdot)\)</span> be an indicator function.</li>
+</ul>
+<p><span class="math display">\[\text{logit}(\pi_i) = \log\Big(\frac{\pi_i}{1-\pi_i}\Big) = \beta_0 +
+\beta_1\cdot I_i(\text{treatment})\]</span></p>
+</div>
+</section>
+<section id="computational-setup" class="slide level2">
+<h2>Computational Setup</h2>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a>acu_model <span class="ot">&lt;-</span> <span class="fu">glm</span>(pain_free <span class="sc">~</span> group, </span>
-<span id="cb1-2"><a href="#cb1-2"></a>                  <span class="at">data  =</span> migraine, </span>
-<span id="cb1-3"><a href="#cb1-3"></a>                 <span class="at">family =</span> <span class="st">"binomial"</span>)</span>
-<span id="cb1-4"><a href="#cb1-4"></a>acu_model <span class="sc">%&gt;%</span></span>
-<span id="cb1-5"><a href="#cb1-5"></a>  tidy <span class="sc">%&gt;%</span></span>
-<span id="cb1-6"><a href="#cb1-6"></a>  <span class="fu">kable</span>(<span class="at">digits =</span> <span class="dv">3</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="co"># load packages</span></span>
+<span id="cb1-2"><a href="#cb1-2"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb1-3"><a href="#cb1-3"></a><span class="fu">library</span>(tidymodels)</span>
+<span id="cb1-4"><a href="#cb1-4"></a><span class="fu">library</span>(openintro)</span>
+<span id="cb1-5"><a href="#cb1-5"></a><span class="fu">library</span>(knitr)</span>
+<span id="cb1-6"><a href="#cb1-6"></a><span class="fu">library</span>(RColorBrewer)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="fit-the-model" class="slide level2">
+<h2>Fit the model</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a>acu_model <span class="ot">&lt;-</span> <span class="fu">glm</span>(pain_free <span class="sc">~</span> group, </span>
+<span id="cb2-2"><a href="#cb2-2"></a>                  <span class="at">data  =</span> migraine, </span>
+<span id="cb2-3"><a href="#cb2-3"></a>                 <span class="at">family =</span> <span class="st">"binomial"</span>)</span>
+<span id="cb2-4"><a href="#cb2-4"></a>acu_model <span class="sc">%&gt;%</span></span>
+<span id="cb2-5"><a href="#cb2-5"></a>  tidy <span class="sc">%&gt;%</span></span>
+<span id="cb2-6"><a href="#cb2-6"></a>  <span class="fu">kable</span>(<span class="at">digits =</span> <span class="dv">3</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <table>
 <thead>
@@ -842,128 +886,104 @@
 </div>
 </div>
 <div class="poll">
-<p><span class="math display">\[\log\Big(\frac{\hat{\pi}}{1-\hat{\pi}}\Big) = -3.091 + 1.897 \times \text{treatment}\]</span></p>
+<p><span class="math display">\[\log\Big(\frac{\hat{\pi}_i}{1-\hat{\pi}_i}\Big) = -3.091 + 1.897 \cdot I(\text{treatment})\]</span></p>
 </div>
 </section>
-<section id="interpreting-treatment-coefficient---log-odds" class="slide level2">
-<h2>Interpreting <strong>treatment</strong> coefficient - log odds</h2>
-<div class="cell">
-<div class="cell-output-display">
-<table>
-<thead>
-<tr class="header">
-<th style="text-align: left;">term</th>
-<th style="text-align: right;">estimate</th>
-<th style="text-align: right;">std.error</th>
-<th style="text-align: right;">statistic</th>
-<th style="text-align: right;">p.value</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td style="text-align: left;">(Intercept)</td>
-<td style="text-align: right;">-3.091</td>
-<td style="text-align: right;">0.723</td>
-<td style="text-align: right;">-4.276</td>
-<td style="text-align: right;">0.000</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">grouptreatment</td>
-<td style="text-align: right;">1.897</td>
-<td style="text-align: right;">0.808</td>
-<td style="text-align: right;">2.348</td>
-<td style="text-align: right;">0.019</td>
-</tr>
-</tbody>
-</table>
+<section id="log-odds-by-treatment-group" class="slide level2">
+<h2>Log-odds by treatment group</h2>
+<div class="poll">
+<p><span class="math display">\[\log\Big(\frac{\hat{\pi}_i}{1-\hat{\pi}_i}\Big) = -3.091 + 1.897 \cdot I(\text{treatment})\]</span></p>
 </div>
+<div>
+<ul>
+<li>For someone in the control group, <span class="math inline">\(\log\Big(\frac{\hat{\pi}_i}{1-\hat{\pi}_i}\Big) = -3.091\)</span>.</li>
+<li>For someone in the treatment group, <span class="math inline">\(\log\Big(\frac{\hat{\pi}_i}{1-\hat{\pi}_i}\Big) = -3.091 + 1.897 = -1.194\)</span>.</li>
+<li><span class="math inline">\(\beta_1=1.897\)</span> measures the difference in log-odds for someone in the treatment group vs.&nbsp;the control group.</li>
+</ul>
 </div>
-<p>The <strong>log-odds</strong> of being pain-free post-treatment are expected to be 1.897 higher for those who received treatment compared to those who did not receive treatment.</p>
 </section>
-<section id="interpreting-treatment-coefficient---odds" class="slide level2">
-<h2>Interpreting <strong>treatment</strong> coefficient - odds</h2>
-<div class="cell">
-<div class="cell-output-display">
-<table>
-<thead>
-<tr class="header">
-<th style="text-align: left;">term</th>
-<th style="text-align: right;">estimate</th>
-<th style="text-align: right;">std.error</th>
-<th style="text-align: right;">statistic</th>
-<th style="text-align: right;">p.value</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td style="text-align: left;">(Intercept)</td>
-<td style="text-align: right;">-3.091</td>
-<td style="text-align: right;">0.723</td>
-<td style="text-align: right;">-4.276</td>
-<td style="text-align: right;">0.000</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">grouptreatment</td>
-<td style="text-align: right;">1.897</td>
-<td style="text-align: right;">0.808</td>
-<td style="text-align: right;">2.348</td>
-<td style="text-align: right;">0.019</td>
-</tr>
-</tbody>
-</table>
+<section id="interpretations-by-treatment-group" class="slide level2">
+<h2>Interpretations by treatment group</h2>
+<div class="poll">
+<p><span class="math display">\[\log\Big(\frac{\hat{\pi}_i}{1-\hat{\pi}_i}\Big) = -3.091 + 1.897 \cdot I(\text{treatment})\]</span></p>
 </div>
+<div>
+<ul>
+<li>For those in the treatment group, the <strong>log-odds</strong> of being pain-free post-treatment are expected to be 1.897 higher compared to those in the control group.</li>
+<li>For those in the treatment group, the <strong>odds</strong> of being pain-free post-treatment are expected to be 6.67 (i.e.&nbsp;exp(1.897)) times the odds of those in the control group.</li>
+</ul>
 </div>
-<p>The <strong>odds</strong> of being pain-free post-treatment for those who received treatment are expected to be 6.67 (i.e.&nbsp;exp(1.897)) times the odds for those who received the control.</p>
 </section>
-<section id="predicted-log-odds" class="slide level2">
-<h2>Predicted log odds</h2>
+<section id="predicted-log-odds-and-odds" class="slide level2 smallish">
+<h2>Predicted log odds and odds</h2>
 <div class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a><span class="fu">predict</span>(acu_model)[<span class="dv">1</span><span class="sc">:</span><span class="dv">7</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>        1         2         3         4         5         6         7 
 -1.193922 -1.193922 -1.193922 -1.193922 -1.193922 -1.193922 -1.193922 </code></pre>
 </div>
 </div>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a><span class="fu">predict</span>(acu_model)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div>
+<ul>
+<li>We can use the <code>predict</code> function to get the predicted log odds for individuals.</li>
+<li>Person 1 is in the treatment group.</li>
+<li>For person 1, predicted <strong>log odds</strong> = -1.1939.</li>
+<li>Then, we can exponentiate this value to get the predicted odds.</li>
+<li>For person 1, predicted <strong>odds</strong> = exp(-1.1939) = 0.303.</li>
+</ul>
 </div>
-<p>For person 1:</p>
-<p>the predicted odds =</p>
-<p><span class="math display">\[\hat{\omega} = \frac{\hat{\pi}}{{1-\hat{\pi}}} = \exp(-1.1939) = 0.303\]</span></p>
 </section>
-<section id="predicted-probabilities" class="slide level2">
-<h2>Predicted probabilities</h2>
+<section id="predicted-probabilities-treatment" class="slide level2">
+<h2>Predicted probabilities, treatment</h2>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a><span class="fu">predict</span>(acu_model, </span>
-<span id="cb4-2"><a href="#cb4-2"></a>        <span class="at">type =</span> <span class="st">"response"</span>) <span class="co">#&lt;&lt;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<div class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1"></a><span class="fu">predict</span>(acu_model, </span>
+<span id="cb5-2"><a href="#cb5-2"></a>        <span class="at">type =</span> <span class="st">"response"</span>)[<span class="dv">1</span><span class="sc">:</span><span class="dv">7</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>        1         2         3         4         5         6         7 
 0.2325581 0.2325581 0.2325581 0.2325581 0.2325581 0.2325581 0.2325581 </code></pre>
 </div>
 </div>
-<p>For person 1:</p>
-<p>predicted probability =</p>
-<p><span class="math display">\[\hat{\pi} = \frac{\exp{(-1.1939)}}{1+\exp{(-1.1939)}} = .232\]</span></p>
-</section>
-<section id="assumptions-of-logistic-regression" class="slide level2">
-<h2>Assumptions of logistic regression</h2>
 <div>
-<ol type="1">
-<li><strong>Binary responses</strong>: Response is dichotomous (only takes on two values), or is the sum of dichotomous responses.</li>
-<li><strong>Independence</strong>: Observations independent of one another.</li>
-<li><strong>Variance structure</strong>: Variance of binomial random variable is <span class="math inline">\(n\pi(1-\pi)\)</span>, variance highest when <span class="math inline">\(\pi=0.5\)</span>.</li>
-<li><strong>Linearity</strong>: Log of the odds ratio, <span class="math inline">\(\log (\frac{\pi}{1-\pi})\)</span>, is a linear function of <span class="math inline">\(x\)</span>.</li>
-</ol>
+<ul>
+<li>We can use the <code>type = "response"</code> option to print the predicted probabilities instead.</li>
+<li>For person 1 (treatment group), predicted probability =</li>
+</ul>
 </div>
+<p><span class="math display">\[\hat{\pi}_i = \frac{\exp{(-1.1939)}}{1+\exp{(-1.1939)}} = .232\]</span></p>
+</section>
+<section id="predicted-probabilities-control" class="slide level2 smallish">
+<h2>Predicted probabilities, control</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1"></a><span class="fu">predict</span>(acu_model)[<span class="dv">83</span><span class="sc">:</span><span class="dv">89</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>       83        84        85        86        87        88        89 
+-3.091042 -3.091042 -3.091042 -3.091042 -3.091042 -3.091042 -3.091042 </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1"></a><span class="fu">predict</span>(acu_model, </span>
+<span id="cb9-2"><a href="#cb9-2"></a>        <span class="at">type =</span> <span class="st">"response"</span>)[<span class="dv">83</span><span class="sc">:</span><span class="dv">89</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>        83         84         85         86         87         88         89 
+0.04347826 0.04347826 0.04347826 0.04347826 0.04347826 0.04347826 0.04347826 </code></pre>
+</div>
+</div>
+<div>
+<ul>
+<li>We can compare this to the predicted probability for an individual in the control group.</li>
+<li>For person 83 (control group), predicted probability =<br>
+</li>
+</ul>
+</div>
+<p><span class="math display">\[\hat{\pi}_i = \frac{\exp{(-3.091)}}{1+\exp{(-3.091)}} = .043\]</span></p>
 </section>
 <section id="hypothesis-test-for-beta_j" class="slide level2">
 <h2>Hypothesis test for <span class="math inline">\(\beta_j\)</span></h2>
-<p><strong>Hypotheses</strong>: <span class="math inline">\(H_0: \beta_j = 0\)</span> vs <span class="math inline">\(H_A: \beta_j \neq 0\)</span></p>
 <div>
 <ul>
-<li><p><span class="math inline">\(H_0\)</span>: There is no linear relationship between the variable of interest and the log-odds of the response.</p></li>
-<li><p><span class="math inline">\(H_A\)</span>: There <strong>is</strong> a linear relationship between the variable of interest and the log-odds of the response.</p></li>
+<li>We’ve seen that <span class="math inline">\(\beta_1\)</span> estimates the difference in log odds between those in the treatment group versus those in the control.</li>
+<li>Is <span class="math inline">\(\beta_1\)</span> large enough to determine statistical significance?</li>
+<li><strong>Hypotheses</strong>: <span class="math inline">\(H_0: \beta_j = 0\)</span> vs <span class="math inline">\(H_A: \beta_j \neq 0\)</span></li>
+<li><span class="math inline">\(H_0\)</span>: There is no linear relationship between the variable of interest and the log-odds of the response.</li>
+<li><span class="math inline">\(H_A\)</span>: There <strong>is</strong> a linear relationship between the variable of interest and the log-odds of the response.</li>
 </ul>
 </div>
 </section>
@@ -981,14 +1001,14 @@
 <p>where <span class="math inline">\(z^*\)</span> comes from <span class="math inline">\(N(0,1)\)</span>.</p>
 <p>This is an interval for the change in log-odds of the response for a one-unit increase in <span class="math inline">\(x_j\)</span>.</p>
 </section>
-<section id="interpretation-in-terms-of-odds" class="slide level2">
-<h2>Interpretation in terms of odds</h2>
+<section id="ci-interpretation-in-terms-of-odds" class="slide level2">
+<h2>CI interpretation in terms of odds</h2>
 <p>The change in <strong>odds</strong> for every one-unit change in <span class="math inline">\(x_j\)</span>.</p>
-<p><span class="math display">\[\exp{\hat{\beta}_j \pm z^* SE_{\hat{\beta}_j}}\]</span></p>
-<p><strong>Interpretation</strong>: We are <span class="math inline">\(C\)</span>% confident that for every one-unit increase in <span class="math inline">\(x_j\)</span>, the odds multiply by a factor of <span class="math inline">\(\big\{\exp{\hat{\beta}_j - z^* SE_{\hat{\beta}_j}}\big\}\)</span> to <span class="math inline">\(\big\{\exp{\hat{\beta}_j + z^* SE_{\hat{\beta}_j}}\big\}\)</span>, holding all other variables constant.</p>
+<p><span class="math display">\[\exp\Big(\hat{\beta}_j \pm z^* SE_{\hat{\beta}_j}\Big)\]</span></p>
+<p><strong>Interpretation</strong>: We are <span class="math inline">\(C\)</span>% confident that for every one-unit increase in <span class="math inline">\(x_j\)</span>, the odds multiply by a factor of <span class="math inline">\(\exp\Big({\hat{\beta}_j - z^* SE_{\hat{\beta}_j}}\big)\)</span> to <span class="math inline">\(\exp\Big({\hat{\beta}_j + z^* SE_{\hat{\beta}_j}}\big)\)</span>, holding all other variables constant.</p>
 </section>
-<section id="lets-look-at-the-coefficient-for-treatment" class="slide level2">
-<h2>Let’s look at the coefficient for treatment</h2>
+<section id="test-statistic" class="slide level2">
+<h2>Test statistic</h2>
 <div class="cell">
 <div class="cell-output-display">
 <table>
@@ -1023,8 +1043,8 @@
 <p><strong>Test statistic</strong></p>
 <p><span class="math display">\[z = \frac{1.897-0}{0.808} = 2.34778\]</span></p>
 </section>
-<section id="lets-look-at-the-coefficient-for-treatment-1" class="slide level2">
-<h2>Let’s look at the coefficient for treatment</h2>
+<section id="p-value" class="slide level2">
+<h2>P-value</h2>
 <div class="cell">
 <div class="cell-output-display">
 <table>
@@ -1059,14 +1079,14 @@
 <p><strong>P-value</strong></p>
 <p><span class="math display">\[P(|Z| &gt; |2.34778|)\]</span></p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1"></a><span class="dv">2</span> <span class="sc">*</span> <span class="fu">pnorm</span>(<span class="fl">2.34778</span>, <span class="at">lower.tail =</span> <span class="cn">FALSE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1"></a><span class="dv">2</span> <span class="sc">*</span> <span class="fu">pnorm</span>(<span class="fl">2.34778</span>, <span class="at">lower.tail =</span> <span class="cn">FALSE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 0.01888567</code></pre>
 </div>
 </div>
 </section>
-<section id="lets-look-at-the-coefficient-for-treatment-2" class="slide level2">
-<h2>Let’s look at the coefficient for treatment</h2>
+<section id="conclusion" class="slide level2">
+<h2>Conclusion</h2>
 <div class="cell">
 <div class="cell-output-display">
 <table>
@@ -1099,20 +1119,6 @@
 </div>
 </div>
 <p><strong>Conclusion</strong>: Since the p-value is quite small, we reject <span class="math inline">\(H_0\)</span>. The data provide sufficient evidence that the acupuncture treatment is a statistically significant predictor of being migraine-pain-free post-treatment.</p>
-</section>
-<section id="computational-setup" class="slide level2">
-<h2>Computational Setup</h2>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1"></a><span class="co"># load packages</span></span>
-<span id="cb8-2"><a href="#cb8-2"></a><span class="fu">library</span>(tidyverse)</span>
-<span id="cb8-3"><a href="#cb8-3"></a><span class="fu">library</span>(tidymodels)</span>
-<span id="cb8-4"><a href="#cb8-4"></a><span class="fu">library</span>(openintro)</span>
-<span id="cb8-5"><a href="#cb8-5"></a><span class="fu">library</span>(knitr)</span>
-<span id="cb8-6"><a href="#cb8-6"></a><span class="fu">library</span>(RColorBrewer)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-</section>
-<section id="acupuncture-example-with-code" class="slide level2">
-<h2>Acupuncture example with code</h2>
 </section></section>
 <section>
 <section id="activity" class="title-slide slide level1 center">
@@ -1123,12 +1129,9 @@
 <h2>Regression Bingo Game</h2>
 <div>
 <ul>
-<li>Pair up - two people per bingo card.</li>
+<li>Form groups of 2-3 people per bingo card.</li>
 <li>Each square on bingo card has a question.</li>
-<li>“Answers” located throughout room. If you think you’ve found a correct answer, tear off answer and place it on the square.
-<ul>
-<li>Write a note on your card about what the answer said</li>
-</ul></li>
+<li>“Answers” located throughout room. If you think you’ve found a correct answer, tear off answer and place it on the square.</li>
 <li>When you get bingo (3 in a row), shout it out and share your 3 question/answers.</li>
 <li>If you’d like to see any slide from this lecture, feel free to ask!</li>
 </ul>
